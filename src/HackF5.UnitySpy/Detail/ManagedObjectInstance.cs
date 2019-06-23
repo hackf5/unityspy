@@ -13,6 +13,10 @@
 
         public abstract TypeDefinition TypeDefinition { get; }
 
+        public dynamic this[string fieldName] => this.GetValue<dynamic>(fieldName);
+
+        public dynamic this[string fieldName, string typeFullName] => this.GetValue<dynamic>(fieldName, typeFullName);
+
         public TValue GetValue<TValue>(string fieldName) => this.GetValue<TValue>(fieldName, default);
 
         public TValue GetValue<TValue>(string fieldName, string typeFullName)

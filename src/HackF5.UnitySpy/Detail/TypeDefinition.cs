@@ -78,6 +78,8 @@
 
         public uint VTable { get; }
 
+        public dynamic this[string fieldName] => this.GetStaticValue<dynamic>(fieldName);
+
         IFieldDefinition ITypeDefinition.GetField(string fieldName, string typeFullName) =>
             this.GetField(fieldName, typeFullName);
 

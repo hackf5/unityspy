@@ -15,8 +15,6 @@ using System.Windows.Shapes;
 
 namespace HackF5.UnitySpy.Gui
 {
-    using HackF5.UnitySpy.Dynamic;
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -26,10 +24,15 @@ namespace HackF5.UnitySpy.Gui
         {
             InitializeComponent();
 
-            var image = AssemblyImageFactory.Create("Hearthstone").ToDynamic();
+            var image = AssemblyImageFactory.Create("Hearthstone");
             var items = image["CollectionManager"]["s_instance"]["m_collectibleCards"]["_items"];
             foreach (var item in items)
             {
+                if (item == null)
+                {
+                    continue;
+                }
+
                 var cardId = item["m_EntityDef"]["m_cardIdInternal"];
                 var count = item["<OwnedCount>k__BackingField"];
                 var isGolden = item["m_PremiumType"] == 1;

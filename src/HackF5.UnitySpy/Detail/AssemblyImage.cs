@@ -3,7 +3,6 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using HackF5.UnitySpy.Dynamic;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
@@ -55,12 +54,12 @@
 
         public override ProcessFacade Process { get; }
 
-        ITypeDefinition IAssemblyImage.GetTypeDefinition(string fullName) => this.GetTypeDefinition(fullName);
+        public dynamic this[string fullTypeName] => this.GetTypeDefinition(fullTypeName);
 
-        public dynamic ToDynamic() => new DynamicAssemblyImage(this, new DynamicObjectCache());
+        ITypeDefinition IAssemblyImage.GetTypeDefinition(string fullTypeName) => this.GetTypeDefinition(fullTypeName);
 
-        public TypeDefinition GetTypeDefinition(string fullName) =>
-            this.typeDefinitionsByFullName.TryGetValue(fullName, out var d) ? d : default;
+        public TypeDefinition GetTypeDefinition(string fullTypeName) =>
+            this.typeDefinitionsByFullName.TryGetValue(fullTypeName, out var d) ? d : default;
 
         public TypeDefinition GetTypeDefinition(uint address)
         {
@@ -78,7 +77,7 @@
         {
             var definitions = new ConcurrentDictionary<uint, TypeDefinition>();
 
-            var classCache = 0x2a0u;
+            const uint classCache = 0x2a0u;
             var classCacheSize = this.ReadUInt32(classCache + 0xc);
             var classCacheTableArray = this.ReadPtr(classCache + 0x14);
 

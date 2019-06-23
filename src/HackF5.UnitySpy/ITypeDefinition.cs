@@ -46,6 +46,8 @@
         /// </summary>
         ITypeInfo TypeInfo { get; }
 
+        dynamic this[string fieldName] { get; }
+
         /// <summary>
         /// Gets the <see cref="IFieldDefinition"/> declared in the type with the given <paramref name="fieldName"/>.
         /// </summary>

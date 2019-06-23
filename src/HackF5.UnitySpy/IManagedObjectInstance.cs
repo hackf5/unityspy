@@ -13,6 +13,10 @@
         /// </summary>
         ITypeDefinition TypeDefinition { get; }
 
+        dynamic this[string fieldName] { get; }
+
+        dynamic this[string fieldName, string typeFullName] { get; }
+
         /// <summary>
         /// Gets the value of the field in the instance with the given <paramref name="fieldName"/>.
         /// </summary>

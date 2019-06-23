@@ -18,6 +18,8 @@
         /// </summary>
         IEnumerable<ITypeDefinition> TypeDefinitions { get; }
 
+        dynamic this[string fullTypeName] { get; }
+
         /// <summary>
         /// Gets the <see cref="ITypeDefinition"/> with given <paramref name="fullName"/> from the assembly image.
         /// </summary>
@@ -28,13 +30,5 @@
         /// <c>null</c> if no such definition exists.
         /// </returns>
         ITypeDefinition GetTypeDefinition(string fullName);
-
-        /// <summary>
-        /// Gets a dynamic view of the <see cref="IAssemblyImage"/> that is less verbose to work with.
-        /// </summary>
-        /// <returns>
-        /// A dynamic view of the <see cref="IAssemblyImage"/>.
-        /// </returns>
-        dynamic ToDynamic();
     }
 }
