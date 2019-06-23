@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Company>HackF5</Company>
+    <Product>HackF5.UnitySpy</Product>
+    <Authors>dev@HackF5</Authors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyFileVersion>1.0.0.0</AssemblyFileVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+</Project>

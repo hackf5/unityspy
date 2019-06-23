@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackF5.UnitySpy", "HackF5.UnitySpy\HackF5.UnitySpy.csproj", "{7207C1B6-4688-418E-A590-380C9488260F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{DD3559B1-4C0B-4EB9-82DB-DB0E82FDEC64}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		HackF5.UnitySpy.sln.DotSettings = HackF5.UnitySpy.sln.DotSettings
+		HackF5.UnitySpy.snk = HackF5.UnitySpy.snk
+		..\README.md = ..\README.md
+		rules.ruleset = rules.ruleset
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7207C1B6-4688-418E-A590-380C9488260F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7207C1B6-4688-418E-A590-380C9488260F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7207C1B6-4688-418E-A590-380C9488260F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7207C1B6-4688-418E-A590-380C9488260F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF2C925F-01B9-49D1-AC1E-11A433147361}
+	EndGlobalSection
+EndGlobal
