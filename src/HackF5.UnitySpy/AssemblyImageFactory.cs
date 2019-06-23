@@ -29,6 +29,20 @@
         /// </returns>
         public static IAssemblyImage Create(string processName, string assemblyName = "Assembly-CSharp")
         {
+            if (Environment.Is64BitProcess)
+            {
+                throw new InvalidOperationException(
+                    "Due to issues with module discovery of a 32-bit process from a 64-bit process in Windows "
+                    + "64-bit processes are not supported.");
+            }
+
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+            {
+                throw new InvalidOperationException(
+                    "This library reads data directly from a process's memory, so is platform specific "
+                    + "and only runs under Windows. It might be possible to get it running under macOS, but...");
+            }
+
             var process = new ProcessFacade(processName);
             var monoModule = AssemblyImageFactory.GetMonoModule(process);
             var moduleDump = process.ReadModule(monoModule);

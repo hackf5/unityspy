@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace HackF5.UnitySpy.Gui
+{
+    using HackF5.UnitySpy.Dynamic;
+
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            var image = AssemblyImageFactory.Create("Hearthstone").ToDynamic();
+            var items = image["CollectionManager"]["s_instance"]["m_collectibleCards"]["_items"];
+            foreach (var item in items)
+            {
+                var cardId = item["m_EntityDef"]["m_cardIdInternal"];
+                var count = item["<OwnedCount>k__BackingField"];
+                var isGolden = item["m_PremiumType"] == 1;
+            }
+        }
+    }
+}

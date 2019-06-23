@@ -35,7 +35,7 @@
                 case TypeCode.SZARRAY:
                 case TypeCode.GENERICINST:
                 case TypeCode.VALUETYPE:
-                    typeDefinition = this.Image.GetClassDefinition(this.Process.ReadPtr(this.Data));
+                    typeDefinition = this.Image.GetTypeDefinition(this.Process.ReadPtr(this.Data));
                     return true;
                 default:
                     typeDefinition = null;

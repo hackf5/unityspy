@@ -9,7 +9,7 @@
     /// https://web.archive.org/web/20080919091745/http://msdn.microsoft.com:80/en-us/magazine/cc163791.aspx.
     /// </summary>
     [PublicAPI]
-    public class ManagedStructInstance : MemoryObject, IManagedObjectInstance
+    public class ManagedStructInstance : ManagedObjectInstance
     {
         public ManagedStructInstance(TypeDefinition typeDefinition, uint address)
             : base(typeDefinition.Image, address)
@@ -23,13 +23,6 @@
             this.TypeDefinition = typeDefinition;
         }
 
-        ITypeDefinition IManagedObjectInstance.TypeDefinition => this.TypeDefinition;
-
-        public TypeDefinition TypeDefinition { get; }
-
-        public TValue GetValue<TValue>(string fieldName) =>
-            this.TypeDefinition.GetField(fieldName).GetValue<TValue>(this.Address);
-
-        public TValue GetValue<TValue>(string fieldName, string typeFullName) => this.GetValue<TValue>(fieldName);
+        public override TypeDefinition TypeDefinition { get; }
     }
 }

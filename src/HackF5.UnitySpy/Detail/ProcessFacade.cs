@@ -171,8 +171,8 @@
 
             var vtable = this.ReadPtr(ptr);
             var arrayDefinitionPtr = this.ReadPtr(vtable);
-            var arrayDefinition = type.Image.GetClassDefinition(arrayDefinitionPtr);
-            var elementDefinition = type.Image.GetClassDefinition(this.ReadPtr(arrayDefinitionPtr));
+            var arrayDefinition = type.Image.GetTypeDefinition(arrayDefinitionPtr);
+            var elementDefinition = type.Image.GetTypeDefinition(this.ReadPtr(arrayDefinitionPtr));
 
             var count = this.ReadInt32(ptr + 0xc);
             var start = ptr + 0x10;
@@ -195,7 +195,7 @@
 
         private object ReadManagedGenericObject(TypeInfo type, uint address)
         {
-            var genericDefinition = type.Image.GetClassDefinition(this.ReadPtr(type.Data));
+            var genericDefinition = type.Image.GetTypeDefinition(this.ReadPtr(type.Data));
             if (genericDefinition.IsValueType)
             {
                 throw new NotSupportedException("Generic value types are not supported.");
@@ -222,7 +222,7 @@
 
         private object ReadManagedStructInstance(TypeInfo type, uint address)
         {
-            var definition = type.Image.GetClassDefinition(type.Data);
+            var definition = type.Image.GetTypeDefinition(type.Data);
             var obj = new ManagedStructInstance(definition, address);
             return obj.TypeDefinition.IsEnum ? obj.GetValue<object>("value__") : obj;
         }

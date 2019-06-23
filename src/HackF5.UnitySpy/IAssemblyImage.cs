@@ -12,11 +12,11 @@
     public interface IAssemblyImage : IMemoryObject
     {
         /// <summary>
-        /// Gets the class definitions that are referenced by the assembly. So for example, although
+        /// Gets the type definitions that are referenced by the assembly. So for example, although
         /// <see cref="object"/> is not declared in the assembly, since all types inherit from this type, it is
         /// available in this collection.
         /// </summary>
-        IEnumerable<ITypeDefinition> ClassDefinitions { get; }
+        IEnumerable<ITypeDefinition> TypeDefinitions { get; }
 
         /// <summary>
         /// Gets the <see cref="ITypeDefinition"/> with given <paramref name="fullName"/> from the assembly image.
@@ -27,6 +27,14 @@
         /// The <see cref="ITypeDefinition"/> with given <paramref name="fullName"/> from the assembly image, or
         /// <c>null</c> if no such definition exists.
         /// </returns>
-        ITypeDefinition GetClassDefinition(string fullName);
+        ITypeDefinition GetTypeDefinition(string fullName);
+
+        /// <summary>
+        /// Gets a dynamic view of the <see cref="IAssemblyImage"/> that is less verbose to work with.
+        /// </summary>
+        /// <returns>
+        /// A dynamic view of the <see cref="IAssemblyImage"/>.
+        /// </returns>
+        dynamic ToDynamic();
     }
 }

@@ -115,7 +115,7 @@
         }
 
         private TypeDefinition GetClassDefinition(uint address) =>
-            this.Image.GetClassDefinition(this.ReadPtr(address));
+            this.Image.GetTypeDefinition(this.ReadPtr(address));
 
         private IReadOnlyList<FieldDefinition> GetFields()
         {

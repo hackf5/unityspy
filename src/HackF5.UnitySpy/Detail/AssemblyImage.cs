@@ -3,6 +3,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using HackF5.UnitySpy.Dynamic;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
@@ -14,24 +15,24 @@
     [PublicAPI]
     public class AssemblyImage : MemoryObject, IAssemblyImage
     {
-        private readonly Dictionary<string, TypeDefinition> classDefinitionByFullName =
+        private readonly Dictionary<string, TypeDefinition> typeDefinitionsByFullName =
             new Dictionary<string, TypeDefinition>();
 
-        private readonly ConcurrentDictionary<uint, TypeDefinition> classDefinitionsByAddress;
+        private readonly ConcurrentDictionary<uint, TypeDefinition> typeDefinitionsByAddress;
 
         public AssemblyImage(ProcessFacade process, uint address)
             : base(null, address)
         {
             this.Process = process;
 
-            this.classDefinitionsByAddress = this.CreateClassDefinitions();
+            this.typeDefinitionsByAddress = this.CreateTypeDefinitions();
 
-            foreach (var definition in this.ClassDefinitions)
+            foreach (var definition in this.TypeDefinitions)
             {
                 definition.Init();
             }
 
-            foreach (var definition in this.ClassDefinitions)
+            foreach (var definition in this.TypeDefinitions)
             {
                 if (definition.FullName.Contains("`"))
                 {
@@ -41,37 +42,39 @@
                     continue;
                 }
 
-                this.classDefinitionByFullName.Add(definition.FullName, definition);
+                this.typeDefinitionsByFullName.Add(definition.FullName, definition);
             }
         }
 
-        IEnumerable<ITypeDefinition> IAssemblyImage.ClassDefinitions => this.ClassDefinitions;
+        IEnumerable<ITypeDefinition> IAssemblyImage.TypeDefinitions => this.TypeDefinitions;
 
-        public IEnumerable<TypeDefinition> ClassDefinitions =>
-            this.classDefinitionsByAddress.ToArray().Select(k => k.Value);
+        public IEnumerable<TypeDefinition> TypeDefinitions =>
+            this.typeDefinitionsByAddress.ToArray().Select(k => k.Value);
 
         public override AssemblyImage Image => this;
 
         public override ProcessFacade Process { get; }
 
-        ITypeDefinition IAssemblyImage.GetClassDefinition(string fullName) => this.GetClassDefinition(fullName);
+        ITypeDefinition IAssemblyImage.GetTypeDefinition(string fullName) => this.GetTypeDefinition(fullName);
 
-        public TypeDefinition GetClassDefinition(string fullName) =>
-            this.classDefinitionByFullName.TryGetValue(fullName, out var d) ? d : default;
+        public dynamic ToDynamic() => new DynamicAssemblyImage(this, new DynamicObjectCache());
 
-        public TypeDefinition GetClassDefinition(uint address)
+        public TypeDefinition GetTypeDefinition(string fullName) =>
+            this.typeDefinitionsByFullName.TryGetValue(fullName, out var d) ? d : default;
+
+        public TypeDefinition GetTypeDefinition(uint address)
         {
             if (address == Constants.NullPtr)
             {
                 return default;
             }
 
-            return this.classDefinitionsByAddress.GetOrAdd(
+            return this.typeDefinitionsByAddress.GetOrAdd(
                 address,
                 key => new TypeDefinition(this, key));
         }
 
-        private ConcurrentDictionary<uint, TypeDefinition> CreateClassDefinitions()
+        private ConcurrentDictionary<uint, TypeDefinition> CreateTypeDefinitions()
         {
             var definitions = new ConcurrentDictionary<uint, TypeDefinition>();
 
