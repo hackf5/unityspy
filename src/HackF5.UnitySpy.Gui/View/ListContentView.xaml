@@ -11,7 +11,11 @@
     mc:Ignorable="d">
     <Grid>
         <ListView
+            Name="ItemsList"
+            BorderBrush="Transparent"
+            BorderThickness="0"
             ItemsSource="{Binding Items}"
+            MouseDoubleClick="Control_OnMouseDoubleClick"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.ItemTemplate>

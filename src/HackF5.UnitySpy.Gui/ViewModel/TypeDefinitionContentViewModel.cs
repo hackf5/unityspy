@@ -10,7 +10,9 @@
     {
         private readonly ITypeDefinition definition;
 
-        public TypeDefinitionContentViewModel([NotNull] ITypeDefinition definition, StaticFieldViewModel.Factory fieldFactory)
+        public TypeDefinitionContentViewModel(
+            [NotNull] ITypeDefinition definition,
+            StaticFieldViewModel.Factory fieldFactory)
         {
             this.definition = definition ?? throw new ArgumentNullException(nameof(definition));
             this.StaticFields = this.definition.Fields.Where(f => f.TypeInfo.IsStatic && !f.TypeInfo.IsConstant)
@@ -20,6 +22,13 @@
 
         public delegate TypeDefinitionContentViewModel Factory(ITypeDefinition definition);
 
+        public event EventHandler<AppendToTrailEventArgs> AppendToTrail;
+
         public IEnumerable<StaticFieldViewModel> StaticFields { get; }
+
+        public virtual void OnAppendToTrail(string value)
+        {
+            this.AppendToTrail?.Invoke(this, new AppendToTrailEventArgs(value));
+        }
     }
 }

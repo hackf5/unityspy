@@ -10,7 +10,12 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid>
-        <ListView ItemsSource="{Binding StaticFields}">
+        <ListView
+            Name="ItemsList"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            ItemsSource="{Binding StaticFields}"
+            MouseDoubleClick="Control_OnMouseDoubleClick">
             <ListView.ItemTemplate>
                 <DataTemplate DataType="viewModel:StaticFieldViewModel">
                     <StackPanel Orientation="Horizontal">

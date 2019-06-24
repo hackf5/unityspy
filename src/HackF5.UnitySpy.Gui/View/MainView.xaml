@@ -41,6 +41,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Button
+                Padding="12,0"
                 Grid.Column="1"
                 Command="{Binding RefreshProcessesCommand}">
                 Refresh

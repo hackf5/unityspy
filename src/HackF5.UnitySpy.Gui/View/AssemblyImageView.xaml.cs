@@ -18,7 +18,11 @@
 
         private bool Filter(object item)
         {
-            var definition = (TypeDefinitionViewModel)item;
+            if (!(item is TypeDefinitionViewModel definition))
+            {
+                return false;
+            }
+
             if ((this.HasStaticOnly.IsChecked ?? false) && !definition.HasStaticFields)
             {
                 return false;

@@ -111,6 +111,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mvvm\ViewLocator.cs" />
+    <Compile Include="ViewModel\AppendToTrailEventArgs.cs" />
     <Compile Include="ViewModel\AssemblyImageViewModel.cs" />
     <Compile Include="ViewModel\InstanceFieldViewModel.cs" />
     <Compile Include="ViewModel\ListItemViewModel.cs" />

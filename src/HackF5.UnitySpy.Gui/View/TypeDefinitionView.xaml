@@ -18,13 +18,32 @@
         </Grid.RowDefinitions>
 
         <DockPanel>
-            <TextBlock
-                Background="White"
-                Text="{Binding
-                    FullName,
-                    StringFormat='{}{0}.'}" />
+            <Grid Background="Black">
+                <TextBlock
+                    Margin="2,0,0,0"
+                    VerticalAlignment="Center"
+                    Foreground="Yellow"
+                    Text="{Binding
+                        FullName,
+                        StringFormat='{}{0}.'}" />
+            </Grid>
+            <Button
+                DockPanel.Dock="Right"
+                Padding="8 0"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                Command="{Binding PathBackCommand}">
+                Back
+            </Button>
             <TextBox
                 Name="PathTextBox"
+                Padding="-1, 5, 0, 5"
+                VerticalAlignment="Center"
+                Background="LightGray"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                FontWeight="Bold"
+                Foreground="Black"
                 Text="{Binding
                     Path,
                     UpdateSourceTrigger=PropertyChanged}" />
@@ -32,6 +51,10 @@
         <ListBox
             Grid.Row="1"
             Height="24"
+            Background="Black"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            Foreground="Yellow"
             ItemsSource="{Binding Trail}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

@@ -13,6 +13,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
@@ -20,16 +21,25 @@
             <TextBox
                 Name="ListViewFilter"
                 DockPanel.Dock="Top"
+                Padding="5"
+                Background="Black"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                Foreground="Yellow"
                 TextChanged="ListViewFilter_OnTextChanged" />
             <CheckBox
                 Name="HasStaticOnly"
-                DockPanel.Dock="Top"
+                DockPanel.Dock="Bottom"
+                Margin="5"
+                VerticalContentAlignment="Center"
                 Click="HasStaticOnly_OnClick"
                 IsChecked="True">
                 Types with static fields only
             </CheckBox>
             <ListView
                 Name="DefinitionsList"
+                BorderBrush="Transparent"
+                BorderThickness="0"
                 ItemsSource="{Binding Types}"
                 SelectedItem="{Binding SelectedType}"
                 SelectionChanged="DefinitionsList_OnSelectionChanged"
@@ -60,8 +70,14 @@
             </ListView>
         </DockPanel>
 
-        <view:TypeDefinitionView
+        <GridSplitter
             Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            Background="Black" />
+
+        <view:TypeDefinitionView
+            Grid.Column="2"
+            Background="White"
             DataContext="{Binding SelectedType}" />
     </Grid>
 </UserControl>

@@ -98,6 +98,8 @@
 
                 // may need supporting
                 case TypeCode.VAR:
+                    //// this is the type code for generic structs class-internals.h_MonoGenericParam. Good luck with
+                    //// that!
                 case TypeCode.OBJECT:
                 case TypeCode.ARRAY:
                 case TypeCode.ENUM:

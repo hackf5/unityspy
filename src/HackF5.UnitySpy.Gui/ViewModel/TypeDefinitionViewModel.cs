@@ -4,11 +4,16 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using HackF5.UnitySpy.Gui.Mvvm;
     using JetBrains.Annotations;
 
     public class TypeDefinitionViewModel : PropertyChangedBase
     {
+        private const string TrailSeparator = "-->";
+
+        private readonly CommandCollection commands;
+
         private readonly ITypeDefinition definition;
 
         private readonly ListContentViewModel.Factory listContentFactory;
@@ -22,11 +27,13 @@
         private string path;
 
         public TypeDefinitionViewModel(
+            [NotNull] CommandCollection commands,
             [NotNull] ITypeDefinition definition,
             [NotNull] TypeDefinitionContentViewModel.Factory typeDefinitionContentFactory,
             [NotNull] ManagedObjectInstanceContentViewModel.Factory managedObjectContentFactory,
             [NotNull] ListContentViewModel.Factory listContentFactory)
         {
+            this.commands = commands ?? throw new ArgumentNullException(nameof(commands));
             this.definition = definition ?? throw new ArgumentNullException(nameof(definition));
             this.typeDefinitionContentFactory = typeDefinitionContentFactory
                 ?? throw new ArgumentNullException(nameof(typeDefinitionContentFactory));
@@ -36,7 +43,9 @@
 
             this.listContentFactory = listContentFactory ?? throw new ArgumentNullException(nameof(listContentFactory));
 
-            this.content = this.typeDefinitionContentFactory(this.definition);
+            var model = this.typeDefinitionContentFactory(this.definition);
+            model.AppendToTrail += this.ModelOnAppendToTrail;
+            this.content = model;
         }
 
         public delegate TypeDefinitionViewModel Factory(ITypeDefinition definition);
@@ -65,7 +74,26 @@
             }
         }
 
+        public AsyncCommand PathBackCommand =>
+            this.commands.CreateAsyncCommand(this.ExecutePathBackAsync, this.CanExecutePathBack);
+
         public BindableCollection<string> Trail { get; } = new BindableCollection<string>();
+
+        private bool CanExecutePathBack() => this.Trail.Count > 2;
+
+        private async Task ExecutePathBackAsync()
+        {
+            await Task.CompletedTask;
+            var items = this.Trail.Skip(1).Where(s => s != TypeDefinitionViewModel.TrailSeparator).ToList();
+            items.RemoveAt(items.Count - 1);
+            this.Path = string.Join(".", items).TrimStart('.');
+        }
+
+        private void ModelOnAppendToTrail(object sender, AppendToTrailEventArgs e)
+        {
+            var items = this.Trail.Skip(1).Where(s => s != TypeDefinitionViewModel.TrailSeparator);
+            this.Path = (string.Join(".", items) + $".{e.Value}").TrimStart('.');
+        }
 
         private void ParsePath(string value)
         {
@@ -98,33 +126,46 @@
             }
 
             this.Trail.Clear();
+            this.Trail.Add(this.definition.FullName);
+            this.Trail.Add(TypeDefinitionViewModel.TrailSeparator);
             if (!trail.Any())
             {
-                this.Content = this.typeDefinitionContentFactory(this.definition);
+                var model = this.typeDefinitionContentFactory(this.definition);
+                model.AppendToTrail += this.ModelOnAppendToTrail;
+                this.Content = model;
                 return;
             }
 
             foreach (var item in trail)
             {
                 this.Trail.Add(item.part);
+                this.Trail.Add(TypeDefinitionViewModel.TrailSeparator);
             }
+
+            this.Trail.RemoveAt(this.Trail.Count - 1);
 
             var content = trail.Last().item;
             if (content is ITypeDefinition type)
             {
-                this.Content = this.typeDefinitionContentFactory(type);
+                var model = this.typeDefinitionContentFactory(type);
+                model.AppendToTrail += this.ModelOnAppendToTrail;
+                this.Content = model;
                 return;
             }
 
             if (content is IManagedObjectInstance instance)
             {
-                this.Content = this.managedObjectContentFactory(instance);
+                var model = this.managedObjectContentFactory(instance);
+                model.AppendToTrail += this.ModelOnAppendToTrail;
+                this.Content = model;
                 return;
             }
 
             if (content is IList list)
             {
-                this.Content = this.listContentFactory(list);
+                var model = this.listContentFactory(list);
+                model.AppendToTrail += this.ModelOnAppendToTrail;
+                this.Content = model;
                 return;
             }
 

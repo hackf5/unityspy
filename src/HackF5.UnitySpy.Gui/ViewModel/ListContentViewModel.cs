@@ -1,5 +1,6 @@
 ﻿namespace HackF5.UnitySpy.Gui.ViewModel
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -17,6 +18,13 @@
 
         public delegate ListContentViewModel Factory(IList list);
 
+        public event EventHandler<AppendToTrailEventArgs> AppendToTrail;
+
         public IEnumerable<ListItemViewModel> Items { get; }
+
+        public virtual void OnAppendToTrail(string value)
+        {
+            this.AppendToTrail?.Invoke(this, new AppendToTrailEventArgs(value));
+        }
     }
 }
