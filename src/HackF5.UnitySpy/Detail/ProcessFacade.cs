@@ -3,7 +3,6 @@
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
     using HackF5.UnitySpy.Util;
@@ -15,10 +14,9 @@
     [PublicAPI]
     public class ProcessFacade
     {
-        public ProcessFacade(string processName)
+        public ProcessFacade(int processId)
         {
-            this.Process = Process.GetProcessesByName(processName).FirstOrDefault()
-                ?? throw new InvalidOperationException($"Unable to find '{processName} executable.");
+            this.Process = Process.GetProcessById(processId);
         }
 
         public Process Process { get; }
@@ -198,7 +196,7 @@
             var genericDefinition = type.Image.GetTypeDefinition(this.ReadPtr(type.Data));
             if (genericDefinition.IsValueType)
             {
-                throw new NotSupportedException("Generic value types are not supported.");
+                return new ManagedStructInstance(genericDefinition, address);
             }
 
             return this.ReadManagedClassInstance(type, address);

@@ -18,8 +18,8 @@
         /// <summary>
         /// Creates an <see cref="IAssemblyImage"/> that provides access into a Unity application's managed memory.
         /// </summary>
-        /// <param name="processName">
-        /// The name of the Unity process to be inspected. For example 'Hearthstone'.
+        /// <param name="processId">
+        /// The id of the Unity process to be inspected.
         /// </param>
         /// <param name="assemblyName">
         /// The name of the assembly to be inspected. The default setting of 'Assembly-CSharp' is probably what you want.
@@ -27,7 +27,7 @@
         /// <returns>
         /// An <see cref="IAssemblyImage"/> that provides access into a Unity application's managed memory.
         /// </returns>
-        public static IAssemblyImage Create(string processName, string assemblyName = "Assembly-CSharp")
+        public static IAssemblyImage Create(int processId, string assemblyName = "Assembly-CSharp")
         {
             if (Environment.Is64BitProcess)
             {
@@ -43,7 +43,7 @@
                     + "and only runs under Windows. It might be possible to get it running under macOS, but...");
             }
 
-            var process = new ProcessFacade(processName);
+            var process = new ProcessFacade(processId);
             var monoModule = AssemblyImageFactory.GetMonoModule(process);
             var moduleDump = process.ReadModule(monoModule);
             var rootDomainFunctionAddress = AssemblyImageFactory.GetRootDomainFunctionAddress(moduleDump, monoModule);
