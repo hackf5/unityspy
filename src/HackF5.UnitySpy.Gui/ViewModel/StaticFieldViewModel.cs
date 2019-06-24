@@ -36,6 +36,19 @@
             }
         }
 
-        public object Value => this.field.DeclaringType.GetStaticValue<object>(this.Name);
+        public object Value
+        {
+            get
+            {
+                try
+                {
+                    return this.field.DeclaringType.GetStaticValue<object>(this.Name);
+                }
+                catch (Exception ex)
+                {
+                    return $"ERROR: {ex.Message}";
+                }
+            }
+        }
     }
 }

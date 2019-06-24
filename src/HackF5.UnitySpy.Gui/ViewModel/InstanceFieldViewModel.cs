@@ -39,6 +39,19 @@
             }
         }
 
-        public object Value => this.instance.GetValue<object>(this.Name);
+        public object Value
+        {
+            get
+            {
+                try
+                {
+                    return this.instance.GetValue<object>(this.Name);
+                }
+                catch (Exception ex)
+                {
+                    return $"ERROR: {ex.Message}";
+                }
+            }
+        }
     }
 }

@@ -97,10 +97,9 @@
                     return this.ReadManagedGenericObject(type, address);
 
                 // may need supporting
+                case TypeCode.VAR:
                 case TypeCode.OBJECT:
                 case TypeCode.ARRAY:
-                case TypeCode.VAR:
-
                 case TypeCode.ENUM:
                 case TypeCode.MVAR:
 
