@@ -2,11 +2,12 @@
 {
     using System.Threading.Tasks;
     using System.Windows;
+    using JetBrains.Annotations;
 
-    [Register(RegistrationType.Singleton)]
-    public class DialogService
+    [PublicAPI]
+    public static class DialogService
     {
-        public Task ShowAsync(string title, string description)
+        public static Task ShowAsync(string title, string description)
         {
             return MainThreadInvoker.Current.InvokeOnMainThreadAsync(() => MessageBox.Show(description, title));
         }

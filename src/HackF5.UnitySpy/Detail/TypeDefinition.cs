@@ -34,9 +34,14 @@
 
         private readonly Lazy<TypeDefinition> lazyParent;
 
-        public TypeDefinition(AssemblyImage image, uint address)
+        public TypeDefinition([NotNull] AssemblyImage image, uint address)
             : base(image, address)
         {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
             this.bitFields = this.ReadUInt32(0x14);
             this.fieldCount = this.ReadInt32(0x64);
             this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(0x24));

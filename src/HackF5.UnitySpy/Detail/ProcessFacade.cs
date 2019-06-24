@@ -34,8 +34,13 @@
             return this.ReadBufferValue(address, sizeof(int), b => b.ToInt32());
         }
 
-        public object ReadManaged(TypeInfo type, uint address)
+        public object ReadManaged([NotNull] TypeInfo type, uint address)
         {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
             switch (type.TypeCode)
             {
                 case TypeCode.BOOLEAN:
@@ -122,8 +127,13 @@
             }
         }
 
-        public byte[] ReadModule(ProcessModule module)
+        public byte[] ReadModule([NotNull] ProcessModule module)
         {
+            if (module == null)
+            {
+                throw new ArgumentNullException(nameof(module));
+            }
+
             var buffer = new byte[module.ModuleMemorySize];
             this.ReadProcessMemory(buffer, module.BaseAddress);
             return buffer;

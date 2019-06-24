@@ -12,8 +12,6 @@
 
         private readonly AssemblyImageViewModel.Factory imageFactory;
 
-        private readonly DialogService dialogService;
-
         private readonly ProcessViewModel.Factory processFactory;
 
         private AssemblyImageViewModel image;
@@ -23,13 +21,11 @@
         public MainViewModel(
             CommandCollection commands,
             ProcessViewModel.Factory processFactory,
-            AssemblyImageViewModel.Factory imageFactory,
-            DialogService dialogService)
+            AssemblyImageViewModel.Factory imageFactory)
         {
             this.commands = commands;
             this.processFactory = processFactory;
             this.imageFactory = imageFactory;
-            this.dialogService = dialogService;
             this.RefreshProcessesCommand.Execute(default);
         }
 
@@ -59,21 +55,15 @@
 
         private async Task BuildImageAsync(ProcessViewModel process)
         {
-            using (this.commands.Controller.Rent())
+            try
             {
-                try
-                {
-                    var image = AssemblyImageFactory.Create(process.ProcessId);
-                    this.Image = this.imageFactory(image);
-                }
-#pragma warning disable CA1031 // Do not catch general exception types
-                catch (Exception ex)
-#pragma warning restore CA1031 // Do not catch general exception types
-                {
-                    await this.dialogService.ShowAsync(
-                        $"Failed to load process {process.Name} ({process.ProcessId}).",
-                        ex.Message);
-                }
+                this.Image = this.imageFactory(AssemblyImageFactory.Create(process.ProcessId));
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowAsync(
+                    $"Failed to load process {process.Name} ({process.ProcessId}).",
+                    ex.Message);
             }
         }
 

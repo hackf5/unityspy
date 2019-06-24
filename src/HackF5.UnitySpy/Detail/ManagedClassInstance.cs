@@ -1,5 +1,6 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
+    using System;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -15,9 +16,14 @@
 
         private readonly uint vtable;
 
-        public ManagedClassInstance(AssemblyImage image, uint address)
+        public ManagedClassInstance([NotNull] AssemblyImage image, uint address)
             : base(image, address)
         {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+
             // the address of the class instance points directly back the the classes VTable
             this.vtable = this.ReadPtr(0x0);
 

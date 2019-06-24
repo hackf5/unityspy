@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;CA1724;CA1031</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -37,6 +38,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;CA1724;CA1031</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.9.2.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
@@ -100,12 +102,10 @@
     <Compile Include="Mvvm\DialogService.cs" />
     <Compile Include="Mvvm\IMainThreadInvoker.cs" />
     <Compile Include="Mvvm\ExtendedContentControl.cs" />
-    <Compile Include="Mvvm\OperationController.cs" />
     <Compile Include="Mvvm\PropertyChangedBase.cs" />
     <Compile Include="Mvvm\MainThreadInvoker.cs" />
     <Compile Include="Mvvm\RegisterAttribute.cs" />
     <Compile Include="Mvvm\RegistrationType.cs" />
-    <Compile Include="Mvvm\SyncCommand.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -180,9 +180,7 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Util\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Page Include="View\AssemblyImageView.xaml">
       <SubType>Designer</SubType>

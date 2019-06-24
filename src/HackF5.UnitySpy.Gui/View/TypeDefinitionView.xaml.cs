@@ -1,28 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-namespace HackF5.UnitySpy.Gui.View
+﻿namespace HackF5.UnitySpy.Gui.View
 {
-    /// <summary>
-    /// Interaction logic for TypeDefinitionView.xaml
-    /// </summary>
-    public partial class TypeDefinitionView : UserControl
+    public partial class TypeDefinitionView
     {
         public TypeDefinitionView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+            this.Loaded += (sender, args) => this.PathTextBox.Focus();
         }
     }
 }

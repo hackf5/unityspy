@@ -24,6 +24,7 @@
                     FullName,
                     StringFormat='{}{0}.'}" />
             <TextBox
+                Name="PathTextBox"
                 Text="{Binding
                     Path,
                     UpdateSourceTrigger=PropertyChanged}" />

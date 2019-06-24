@@ -32,6 +32,7 @@
                 Name="DefinitionsList"
                 ItemsSource="{Binding Types}"
                 SelectedItem="{Binding SelectedType}"
+                SelectionChanged="DefinitionsList_OnSelectionChanged"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling">
                 <ListView.ItemTemplate>

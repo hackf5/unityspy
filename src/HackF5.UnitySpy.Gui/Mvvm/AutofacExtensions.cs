@@ -5,7 +5,9 @@
     using Autofac;
     using Autofac.Builder;
     using Autofac.Util;
+    using JetBrains.Annotations;
 
+    [PublicAPI]
     public static class AutofacExtensions
     {
         public static IRegistrationBuilder<TLimit, ConcreteReflectionActivatorData, SingleRegistrationStyle> AsSingleton<TLimit>(

@@ -17,5 +17,5 @@
         public string Name => this.process.ProcessName;
 
         public int ProcessId => this.process.Id;
-        }
+    }
 }

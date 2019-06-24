@@ -9,7 +9,7 @@
             "ExtendedContent",
             typeof(object),
             typeof(ExtendedContentControl),
-            new PropertyMetadata(default(object), ExtendedContentControl.OnExtendedContentChanged));
+            new PropertyMetadata(default, ExtendedContentControl.OnExtendedContentChanged));
 
         public object ExtendedContent
         {

@@ -1,5 +1,6 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
+    using System;
     using System.Diagnostics;
     using JetBrains.Annotations;
 
@@ -13,8 +14,8 @@
         "Field: {" + nameof(FieldDefinition.Offset) + "} - {" + nameof(FieldDefinition.Name) + "}")]
     public class FieldDefinition : MemoryObject, IFieldDefinition
     {
-        public FieldDefinition(TypeDefinition declaringType, uint address)
-            : base(declaringType.Image, address)
+        public FieldDefinition([NotNull] TypeDefinition declaringType, uint address)
+            : base((declaringType ?? throw new ArgumentNullException(nameof(declaringType))).Image, address)
         {
             this.DeclaringType = declaringType;
             this.TypeInfo = new TypeInfo(declaringType.Image, this.ReadPtr(0x0));

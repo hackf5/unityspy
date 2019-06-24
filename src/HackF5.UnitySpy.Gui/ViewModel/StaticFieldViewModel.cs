@@ -7,6 +7,7 @@
     using JetBrains.Annotations;
     using TypeCode = HackF5.UnitySpy.Detail.TypeCode;
 
+    [UsedImplicitly]
     public class StaticFieldViewModel
     {
         private readonly IFieldDefinition field;

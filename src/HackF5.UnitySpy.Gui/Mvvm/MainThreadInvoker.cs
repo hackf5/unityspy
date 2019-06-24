@@ -40,17 +40,5 @@
 
             await Application.Current.Dispatcher.InvokeAsync(action);
         }
-
-        public TValue InvokeFuncOnMainThread<TValue>([NotNull] Func<TValue> func)
-        {
-            if (func == null)
-            {
-                throw new ArgumentNullException(nameof(func));
-            }
-
-            TValue value = default;
-            this.InvokeOnMainThread(() => value = func());
-            return value;
-        }
     }
 }

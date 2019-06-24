@@ -54,5 +54,10 @@
             view.Filter = this.Filter;
             view.Refresh();
         }
+
+        private void DefinitionsList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.DefinitionsList.ScrollIntoView(this.DefinitionsList.SelectedItem);
+        }
     }
 }

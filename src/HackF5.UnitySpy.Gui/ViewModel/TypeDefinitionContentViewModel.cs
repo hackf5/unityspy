@@ -8,7 +8,7 @@
 
     public class TypeDefinitionContentViewModel : PropertyChangedBase
     {
-        private ITypeDefinition definition;
+        private readonly ITypeDefinition definition;
 
         public TypeDefinitionContentViewModel([NotNull] ITypeDefinition definition, StaticFieldViewModel.Factory fieldFactory)
         {

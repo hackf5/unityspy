@@ -4,6 +4,7 @@ namespace HackF5.UnitySpy.Util
 {
     using System;
     using System.Threading;
+    using JetBrains.Annotations;
 
     public class ByteArrayPool
     {
@@ -54,8 +55,13 @@ namespace HackF5.UnitySpy.Util
             return item ?? new byte[ByteArrayPool.BufferSize];
         }
 
-        public void Return(byte[] buffer)
+        public void Return([NotNull] byte[] buffer)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
             if (buffer.Length > ByteArrayPool.BufferSize)
             {
                 return;
