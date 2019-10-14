@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HackF5.UnitySpy.HearthstoneLib
+﻿namespace HackF5.UnitySpy.HearthstoneLib.Collection
 {
     public class CollectionCard
     {
