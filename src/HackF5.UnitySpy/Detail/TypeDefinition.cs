@@ -42,19 +42,19 @@
                 throw new ArgumentNullException(nameof(image));
             }
 
-            this.bitFields = this.ReadUInt32(0x14);
-            this.fieldCount = this.ReadInt32(0x64);
-            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(0x24));
-            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(0x28));
+            this.bitFields = this.ReadUInt32(Offsets.MonoClass_bitfields);
+            this.fieldCount = this.ReadInt32(Offsets.MonoClass_field_count);
+            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(Offsets.MonoClass_parent));
+            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(Offsets.MonoClass_nested_in));
             this.lazyFullName = new Lazy<string>(this.GetFullName);
             this.lazyFields = new Lazy<IReadOnlyList<FieldDefinition>>(this.GetFields);
 
-            this.Name = this.ReadString(0x30);
-            this.NamespaceName = this.ReadString(0x34);
-            this.Size = this.ReadInt32(0x58);
-            var vtablePtr = this.ReadPtr(0xa4);
-            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + 0x4);
-            this.TypeInfo = new TypeInfo(image, this.Address + 0x88);
+            this.Name = this.ReadString(Offsets.MonoClass_name);
+            this.NamespaceName = this.ReadString(Offsets.MonoClass_name_space);
+            this.Size = this.ReadInt32(Offsets.MonoClass_sizes);
+            var vtablePtr = this.ReadPtr(Offsets.MonoClass_runtime_info);
+            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + Offsets.MonoClassRuntimeInfo_domain_vtables);
+            this.TypeInfo = new TypeInfo(image, this.Address + Offsets.MonoClass_byval_arg);
         }
 
         IReadOnlyList<IFieldDefinition> ITypeDefinition.Fields => this.Fields;
@@ -126,7 +126,7 @@
 
         private IReadOnlyList<FieldDefinition> GetFields()
         {
-            var firstField = this.ReadPtr(0x74);
+            var firstField = this.ReadPtr(Offsets.MonoClass_fields);
             if (firstField == Constants.NullPtr)
             {
                 return this.Parent?.Fields ?? Array.Empty<FieldDefinition>();

@@ -87,7 +87,8 @@
             {
                 for (var definition = this.Process.ReadPtr(classCacheTableArray + tableItem);
                     definition != Constants.NullPtr;
-                    definition = this.Process.ReadPtr(definition + 0xa8))
+                    definition = this.Process.ReadPtr(definition + Offsets.MonoClass_next_class_cache))
+                //definition = this.Process.ReadPtr(definition + 0xa8))
                 {
                     definitions.GetOrAdd(definition, new TypeDefinition(this, definition));
                 }
