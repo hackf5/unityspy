@@ -58,7 +58,7 @@
             var domain = process.ReadPtr(domainAddress);
 
             //// pointer to array of structs of type _MonoAssembly
-            var assemblyArrayAddress = process.ReadPtr(domain + 0x70);
+            var assemblyArrayAddress = process.ReadPtr(domain + Offsets.MonoDomain_domain_assemblies);
             for (var assemblyAddress = assemblyArrayAddress;
                 assemblyAddress != Constants.NullPtr;
                 assemblyAddress = process.ReadPtr(assemblyAddress + 0x4))
@@ -68,7 +68,7 @@
                 var assemblyName = process.ReadAsciiString(assemblyNameAddress);
                 if (assemblyName == name)
                 {
-                    return new AssemblyImage(process, process.ReadPtr(assembly + 0x40));
+                    return new AssemblyImage(process, process.ReadPtr(assembly + Offsets.MonoAssembly_image ));
                 }
             }
 
