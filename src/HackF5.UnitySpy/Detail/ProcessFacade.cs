@@ -98,8 +98,8 @@
 
                 // may need supporting
                 case TypeCode.VAR:
-                    //// this is the type code for generic structs class-internals.h_MonoGenericParam. Good luck with
-                    //// that!
+                //// this is the type code for generic structs class-internals.h_MonoGenericParam. Good luck with
+                //// that!
                 case TypeCode.OBJECT:
                 case TypeCode.ARRAY:
                 case TypeCode.ENUM:
@@ -128,15 +128,10 @@
             }
         }
 
-        public byte[] ReadModule([NotNull] ProcessModule module)
+        public byte[] ReadModule(Module monoModule)
         {
-            if (module == null)
-            {
-                throw new ArgumentNullException(nameof(module));
-            }
-
-            var buffer = new byte[module.ModuleMemorySize];
-            this.ReadProcessMemory(buffer, module.BaseAddress);
+            var buffer = new byte[monoModule.Size];
+            this.ReadProcessMemory(buffer, monoModule.BaseAddress);
             return buffer;
         }
 

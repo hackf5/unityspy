@@ -1,8 +1,10 @@
 ﻿namespace HackF5.UnitySpy
 {
     using System;
-    using System.Diagnostics;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Text;
     using HackF5.UnitySpy.Detail;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
@@ -29,13 +31,6 @@
         /// </returns>
         public static IAssemblyImage Create(int processId, string assemblyName = "Assembly-CSharp")
         {
-            if (Environment.Is64BitProcess)
-            {
-                throw new InvalidOperationException(
-                    "Due to issues with module discovery of a 32-bit process from a 64-bit process in Windows "
-                    + "64-bit processes are not supported.");
-            }
-
             if (Environment.OSVersion.Platform != PlatformID.Win32NT)
             {
                 throw new InvalidOperationException(
@@ -75,13 +70,44 @@
             throw new InvalidOperationException($"Unable to find assembly '{name}'");
         }
 
-        private static ProcessModule GetMonoModule(ProcessFacade process)
+        // https://stackoverflow.com/questions/36431220/getting-a-list-of-dlls-currently-loaded-in-a-process-c-sharp
+        private static Module GetMonoModule(ProcessFacade process)
         {
-            return process.Process.Modules.Cast<ProcessModule>().FirstOrDefault(m => m.ModuleName == "mono.dll")
-                ?? throw new InvalidOperationException("Unable to find module 'mono.dll'.");
+            IntPtr[] modulePointers = new IntPtr[0];
+            int bytesNeeded = 0;
+
+            // Determine number of modules
+            if (!Native.EnumProcessModulesEx(process.Process.Handle, modulePointers, 0, out bytesNeeded, (uint)ModuleFilter.ListModulesAll))
+            {
+                return null;
+            }
+
+            int totalNumberofModules = bytesNeeded / IntPtr.Size;
+            modulePointers = new IntPtr[totalNumberofModules];
+
+            // Collect modules from the process
+            List<Module> collectedModules = new List<Module>();
+            if (Native.EnumProcessModulesEx(process.Process.Handle, modulePointers, bytesNeeded, out bytesNeeded, (uint)ModuleFilter.ListModulesAll))
+            {
+                for (int index = 0; index < totalNumberofModules; index++)
+                {
+                    StringBuilder moduleFilePath = new StringBuilder(1024);
+                    Native.GetModuleFileNameEx(process.Process.Handle, modulePointers[index], moduleFilePath, (uint)(moduleFilePath.Capacity));
+
+                    string moduleName = Path.GetFileName(moduleFilePath.ToString());
+                    ModuleInformation moduleInformation = new ModuleInformation();
+                    Native.GetModuleInformation(process.Process.Handle, modulePointers[index], out moduleInformation, (uint)(IntPtr.Size * (modulePointers.Length)));
+
+                    // Convert to a normalized module and add it to our list
+                    Module module = new Module(moduleName, moduleInformation.lpBaseOfDll, moduleInformation.SizeOfImage);
+                    collectedModules.Add(module);
+                }
+            }
+            var monoModule = collectedModules.Where(module => module.ModuleName == "mono.dll").FirstOrDefault();
+            return monoModule;
         }
 
-        private static int GetRootDomainFunctionAddress(byte[] moduleDump, ProcessModule monoModule)
+        private static int GetRootDomainFunctionAddress(byte[] moduleDump, Module monoModule)
         {
             // offsets taken from https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
             // ReSharper disable once CommentTypo
