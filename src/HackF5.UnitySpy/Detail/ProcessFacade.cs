@@ -96,11 +96,17 @@
                 case TypeCode.GENERICINST:
                     return this.ReadManagedGenericObject(type, address);
 
-                // may need supporting
-                case TypeCode.VAR:
                 //// this is the type code for generic structs class-internals.h_MonoGenericParam. Good luck with
                 //// that!
+                //// Using the Generic Object works in at least some cases, like
+                //// when retrieving the NetCache service.
+                //// It's probably better to have something incomplete here
+                //// that will raise an exception later on than throwing the exception right away?
                 case TypeCode.OBJECT:
+                    return this.ReadManagedGenericObject(type, address);
+
+                // may need supporting
+                case TypeCode.VAR:
                 case TypeCode.ARRAY:
                 case TypeCode.ENUM:
                 case TypeCode.MVAR:
