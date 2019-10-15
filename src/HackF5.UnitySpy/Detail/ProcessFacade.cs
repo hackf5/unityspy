@@ -128,10 +128,15 @@
             }
         }
 
-        public byte[] ReadModule(Module monoModule)
+        public byte[] ReadModule([NotNull] ModuleInfo monoModuleInfo)
         {
-            var buffer = new byte[monoModule.Size];
-            this.ReadProcessMemory(buffer, monoModule.BaseAddress);
+            if (monoModuleInfo == null)
+            {
+                throw new ArgumentNullException(nameof(monoModuleInfo));
+            }
+
+            var buffer = new byte[monoModuleInfo.Size];
+            this.ReadProcessMemory(buffer, monoModuleInfo.BaseAddress);
             return buffer;
         }
 
