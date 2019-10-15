@@ -6,6 +6,7 @@
     using System.Linq;
     using HackF5.UnitySpy.HearthstoneLib.Detail;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Collection;
+    using HackF5.UnitySpy.HearthstoneLib.Detail.DungeonInfo;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Match;
 
     public class MindVision
@@ -25,6 +26,8 @@
         }
 
         public IReadOnlyList<ICollectionCard> GetCollection() => CollectionReader.GetCollection(this.image);
+
+        public IFullDungeonInfo GetDungeonInfo() => DungeonInfoReader.GetFullDungeonInfo(this.image);
 
         public IMatchInfo GetMatchInfo() => MatchReader.GetMatchInfo(this.image);
     }

@@ -1,5 +1,8 @@
 namespace HackF5.UnitySpy.HearthstoneLib.Tests
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,12 +14,21 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
+        public void ListAllTypes()
+        {
+            var process = Process.GetProcessesByName("Hearthstone").FirstOrDefault();
+            var image = AssemblyImageFactory.Create(process.Id);
+            foreach (var type in image.TypeDefinitions.OrderBy(t => t.FullName)) {
+                Console.WriteLine(type.FullName);
+            }
+        }
+
+        [TestMethod]
         public void TestRetrieveCollection()
         {
             var collection = new MindVision().GetCollection();
             Assert.IsNotNull(collection);
             Assert.IsTrue(collection.Count > 0, "Collection should not be empty.");
-
             this.TestContext.WriteLine($"Collection has {collection.Count} cards.");
         }
 
@@ -27,6 +39,14 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
             var matchInfo = new MindVision().GetMatchInfo();
             Assert.IsNotNull(matchInfo);
             this.TestContext.WriteLine($"Local player's standard rank is {matchInfo.LocalPlayer.StandardRank}.");
+        }
+
+        // You need to have a solo run (Dungeon Run, Monster Hunt, Rumble Run, Dalaran Heist, Tombs of Terror) ongoing
+        [TestMethod]
+        public void TestRetrieveFullDungeonInfo()
+        {
+            var dungeonInfo = new MindVision().GetDungeonInfo();
+            Assert.IsNotNull(dungeonInfo);
         }
     }
 }
