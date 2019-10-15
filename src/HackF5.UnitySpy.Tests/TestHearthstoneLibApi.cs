@@ -1,5 +1,8 @@
 namespace HackF5.UnitySpy.HearthstoneLib.Tests
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,6 +12,16 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
     {
         [PublicAPI]
         public TestContext TestContext { get; set; }
+
+        [TestMethod]
+        public void ListAllTypes()
+        {
+            var process = Process.GetProcessesByName("Hearthstone").FirstOrDefault();
+            var image = AssemblyImageFactory.Create(process.Id);
+            foreach (var type in image.TypeDefinitions.OrderBy(t => t.FullName)) {
+                Console.WriteLine(type.FullName);
+            }
+        }
 
         [TestMethod]
         public void TestRetrieveCollection()
