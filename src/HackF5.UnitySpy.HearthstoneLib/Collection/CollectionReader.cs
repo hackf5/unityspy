@@ -6,9 +6,9 @@ namespace HackF5.UnitySpy.HearthstoneLib.Collection
 
     public class CollectionReader
     {
-        private IAssemblyImage image;
+        private HearthstoneImage image;
 
-        public CollectionReader(IAssemblyImage image)
+        public CollectionReader(HearthstoneImage image)
         {
             this.image = image;
         }
