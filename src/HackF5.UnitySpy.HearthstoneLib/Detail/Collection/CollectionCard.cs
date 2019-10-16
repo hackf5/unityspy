@@ -1,6 +1,6 @@
-﻿namespace HackF5.UnitySpy.HearthstoneLib.Collection
+﻿namespace HackF5.UnitySpy.HearthstoneLib.Detail.Collection
 {
-    public class CollectionCard
+    internal class CollectionCard : ICollectionCard
     {
         public string CardId { get; set; }
 
