@@ -1,6 +1,6 @@
-﻿namespace HackF5.UnitySpy.HearthstoneLib.Match
+﻿namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
 {
-    public class Player
+    internal class Player : IPlayer
     {
         public string Name { get; set; }
 
@@ -20,8 +20,8 @@
 
         public int CardBackId { get; set; }
 
-        public Account Account { get; set; }
+        public IAccount Account { get; set; }
 
-        public BattleTag BattleTag { get; set; }
+        public IBattleTag BattleTag { get; set; }
     }
 }
