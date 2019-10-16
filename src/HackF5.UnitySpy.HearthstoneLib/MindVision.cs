@@ -1,33 +1,31 @@
-﻿
-
-namespace HackF5.UnitySpy.HearthstoneLib
+﻿namespace HackF5.UnitySpy.HearthstoneLib
 {
-    using System.Diagnostics;
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
-    using HackF5.UnitySpy.HearthstoneLib.Collection;
-    using HackF5.UnitySpy.HearthstoneLib.Match;
+    using HackF5.UnitySpy.HearthstoneLib.Detail;
+    using HackF5.UnitySpy.HearthstoneLib.Detail.Collection;
+    using HackF5.UnitySpy.HearthstoneLib.Detail.Match;
 
     public class MindVision
     {
-        private HearthstoneImage image;
+        private readonly HearthstoneImage image;
 
         public MindVision()
         {
             var process = Process.GetProcessesByName("Hearthstone").FirstOrDefault();
+            if (process == null)
+            {
+                throw new InvalidOperationException(
+                    "Failed to find Hearthstone executable. Please check that Hearthstone is running.");
+            }
+
             this.image = new HearthstoneImage(AssemblyImageFactory.Create(process.Id));
         }
 
-        public List<CollectionCard> GetCollection()
-        {
-            return new CollectionReader(image).GetCollection();
-        }
+        public IReadOnlyList<ICollectionCard> GetCollection() => CollectionReader.GetCollection(this.image);
 
-        public MatchInfo GetMatchInfo()
-        {
-            return new MatchReader(image).GetMatchInfo();
-        }
-
-
+        public IMatchInfo GetMatchInfo() => MatchReader.GetMatchInfo(this.image);
     }
 }

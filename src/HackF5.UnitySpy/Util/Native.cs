@@ -1,10 +1,9 @@
-﻿namespace HackF5.UnitySpy
+﻿namespace HackF5.UnitySpy.Util
 {
     using System;
     using System.Runtime.InteropServices;
     using System.Text;
     using HackF5.UnitySpy.Detail;
-    using HackF5.UnitySpy.Util;
 
     internal static class Native
     {
