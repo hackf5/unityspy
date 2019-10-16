@@ -42,19 +42,19 @@
                 throw new ArgumentNullException(nameof(image));
             }
 
-            this.bitFields = this.ReadUInt32(Offsets.MonoClass_bitfields);
-            this.fieldCount = this.ReadInt32(Offsets.MonoClass_field_count);
-            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(Offsets.MonoClass_parent));
-            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(Offsets.MonoClass_nested_in));
+            this.bitFields = this.ReadUInt32(MonoLibraryOffsets.TypeDefinitionBitFields);
+            this.fieldCount = this.ReadInt32(MonoLibraryOffsets.TypeDefinitionFieldCount);
+            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(MonoLibraryOffsets.TypeDefinitionParent));
+            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(MonoLibraryOffsets.TypeDefinitionNestedIn));
             this.lazyFullName = new Lazy<string>(this.GetFullName);
             this.lazyFields = new Lazy<IReadOnlyList<FieldDefinition>>(this.GetFields);
 
-            this.Name = this.ReadString(Offsets.MonoClass_name);
-            this.NamespaceName = this.ReadString(Offsets.MonoClass_name_space);
-            this.Size = this.ReadInt32(Offsets.MonoClass_sizes);
-            var vtablePtr = this.ReadPtr(Offsets.MonoClass_runtime_info);
-            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + Offsets.MonoClassRuntimeInfo_domain_vtables);
-            this.TypeInfo = new TypeInfo(image, this.Address + Offsets.MonoClass_byval_arg);
+            this.Name = this.ReadString(MonoLibraryOffsets.TypeDefinitionName);
+            this.NamespaceName = this.ReadString(MonoLibraryOffsets.TypeDefinitionNamespace);
+            this.Size = this.ReadInt32(MonoLibraryOffsets.TypeDefinitionSize);
+            var vtablePtr = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
+            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVtables);
+            this.TypeInfo = new TypeInfo(image, this.Address + MonoLibraryOffsets.TypeDefinitionByValArg);
         }
 
         IReadOnlyList<IFieldDefinition> ITypeDefinition.Fields => this.Fields;
@@ -126,7 +126,7 @@
 
         private IReadOnlyList<FieldDefinition> GetFields()
         {
-            var firstField = this.ReadPtr(Offsets.MonoClass_fields);
+            var firstField = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionFields);
             if (firstField == Constants.NullPtr)
             {
                 return this.Parent?.Fields ?? Array.Empty<FieldDefinition>();
