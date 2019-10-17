@@ -1,6 +1,6 @@
 ﻿namespace HackF5.UnitySpy.HearthstoneLib.Detail.DungeonInfo
 {
-    public enum DungeonSaveKey
+    internal enum DungeonSaveKey
     {
         DUNGEON_RUN = 24,
         MONSTER_HUNT = 31,

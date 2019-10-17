@@ -11,7 +11,7 @@
 
     public class MindVision
     {
-        private readonly HearthstoneImage image;
+        private HearthstoneImage image;
 
         public MindVision()
         {
@@ -21,14 +21,29 @@
                 throw new InvalidOperationException(
                     "Failed to find Hearthstone executable. Please check that Hearthstone is running.");
             }
-
-            this.image = new HearthstoneImage(AssemblyImageFactory.Create(process.Id));
         }
 
-        public IReadOnlyList<ICollectionCard> GetCollection() => CollectionReader.GetCollection(this.image);
+        private HearthstoneImage Image
+        {
+            get
+            {
+                if (this.image == null)
+                {
+                    var process = Process.GetProcessesByName("Hearthstone").FirstOrDefault();
+                    if (process != null)
+                    {
+                        this.image = new HearthstoneImage(AssemblyImageFactory.Create(process.Id));
+                    }
+                }
 
-        public IFullDungeonInfo GetDungeonInfo() => DungeonInfoReader.GetFullDungeonInfo(this.image);
+                return this.image;
+            }
+        }
 
-        public IMatchInfo GetMatchInfo() => MatchReader.GetMatchInfo(this.image);
+        public IReadOnlyList<ICollectionCard> GetCollection() => CollectionReader.GetCollection(this.Image);
+
+        public IFullDungeonInfo GetDungeonInfo() => DungeonInfoReader.GetFullDungeonInfo(this.Image);
+
+        public IMatchInfo GetMatchInfo() => MatchReader.GetMatchInfo(this.Image);
     }
 }
