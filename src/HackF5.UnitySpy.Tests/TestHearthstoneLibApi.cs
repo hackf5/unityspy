@@ -48,5 +48,12 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
             var dungeonInfo = new MindVision().GetDungeonInfoCollection();
             Assert.IsNotNull(dungeonInfo);
         }
+
+        [TestMethod]
+        public void TestGetActiveDeck()
+        {
+            var deck = new MindVision().GetActiveDeck();
+            Assert.IsNotNull(deck);
+        }
     }
 }
