@@ -19,5 +19,7 @@
         public int RunActive { get; set; }
 
         public int SelectedDeck { get; set; }
+
+        public int StartingTreasure { get; set; }
     }
 }
