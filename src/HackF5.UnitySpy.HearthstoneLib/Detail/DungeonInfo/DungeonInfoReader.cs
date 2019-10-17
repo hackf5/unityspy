@@ -41,20 +41,36 @@
                 return null;
             }
 
+            var runSaveMap = savesMap["valueSlots"][index];
+            //var values = runSaveMap["valueSlots"];
+            //for (var i = 0; i < values.Length; i++)
+            //{
+            //    Console.Write("" + i + " ->");
+            //    var value = values[i]["_IntValue"];
+            //    var size = value["_size"];
+            //    var items = value["_items"];
+            //    for (var j = 0; j < size; j++)
+            //    {
+            //        Console.Write(" " + items[j] + ", ");
+            //    }
+            //    Console.WriteLine();
+            //}
+
             var runFromMemory = new DungeonInfo
             {
-                DeckCards = ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.DECK_LIST),
+                DeckCards = ExtractValues(runSaveMap, (int)DungeonFieldKey.DECK_LIST),
                 LootOptionBundles = new List<List<int>>()
                 {
-                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_1),
-                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_2),
-                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_3),
+                    ExtractValues(runSaveMap, (int)DungeonFieldKey.LOOT_OPTION_1),
+                    ExtractValues(runSaveMap, (int)DungeonFieldKey.LOOT_OPTION_2),
+                    ExtractValues(runSaveMap, (int)DungeonFieldKey.LOOT_OPTION_3),
                 },
-                ChosenLoot = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.CHOSEN_LOOT),
-                TreasureOption = ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.TREASURE_OPTION),
-                ChosenTreasure = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.CHOSEN_TREASURE),
-                RunActive = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.RUN_ACTIVE),
-                SelectedDeck = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.SELECTED_DECK),
+                ChosenLoot = ExtractValue(runSaveMap, (int)DungeonFieldKey.CHOSEN_LOOT),
+                TreasureOption = ExtractValues(runSaveMap, (int)DungeonFieldKey.TREASURE_OPTION),
+                ChosenTreasure = ExtractValue(runSaveMap, (int)DungeonFieldKey.CHOSEN_TREASURE),
+                RunActive = ExtractValue(runSaveMap, (int)DungeonFieldKey.RUN_ACTIVE),
+                SelectedDeck = ExtractValue(runSaveMap, (int)DungeonFieldKey.SELECTED_DECK),
+                StartingTreasure = ExtractValue(runSaveMap, (int)DungeonFieldKey.SELECTED_DECK),
             };
             return EnrichDeck(image, runFromMemory);
         }
@@ -70,6 +86,7 @@
                 ChosenTreasure = runFromMemory.ChosenTreasure,
                 RunActive = runFromMemory.RunActive,
                 SelectedDeck = runFromMemory.SelectedDeck,
+                StartingTreasure = runFromMemory.StartingTreasure,
                 DeckList = BuildRealDeckList(image, runFromMemory),
             };
         }
@@ -105,6 +122,8 @@
             {
                 if (runFromMemory.SelectedDeck > 0)
                 {
+                    deckList.Add(runFromMemory.StartingTreasure);
+
                     var dbf = image["GameDbf"];
                     var starterDecks = dbf["Deck"]["m_records"]["_items"];
                     for (int i = 0; i < starterDecks.Length; i++)

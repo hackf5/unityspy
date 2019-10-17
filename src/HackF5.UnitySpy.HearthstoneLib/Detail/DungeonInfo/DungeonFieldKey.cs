@@ -11,5 +11,6 @@
         CHOSEN_LOOT = 101,
         CHOSEN_TREASURE = 102,
         SELECTED_DECK = 237,
+        STARTING_TREASURE = 443,
     }
 }

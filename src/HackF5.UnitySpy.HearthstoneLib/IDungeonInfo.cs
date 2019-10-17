@@ -21,5 +21,7 @@
         int RunActive { get; }
 
         int SelectedDeck { get; }
+
+        int StartingTreasure { get; }
     }
 }
