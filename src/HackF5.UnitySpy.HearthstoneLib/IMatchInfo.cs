@@ -7,9 +7,9 @@
     {
         int BrawlSeasonId { get; }
 
-        int FormatType { get; }
+        GameFormat FormatType { get; }
 
-        int GameType { get; }
+        GameType GameType { get; }
 
         IPlayer LocalPlayer { get; }
 

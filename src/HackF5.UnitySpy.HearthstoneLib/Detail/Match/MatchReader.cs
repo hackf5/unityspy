@@ -113,8 +113,8 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
             if (gameMgr != null)
             {
                 matchInfo.MissionId = gameMgr["m_missionId"];
-                matchInfo.GameType = gameMgr["m_gameType"];
-                matchInfo.FormatType = gameMgr["m_formatType"];
+                matchInfo.GameType = (GameType)gameMgr["m_gameType"];
+                matchInfo.FormatType = (GameFormat)gameMgr["m_formatType"];
             }
 
             if (netCacheValues != null)
