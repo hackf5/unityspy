@@ -94,7 +94,6 @@
                 if (runFromMemory.SelectedDeck > 0)
                 {
                     deckList.Add(runFromMemory.StartingTreasure);
-
                     var dbf = image["GameDbf"];
                     var starterDecks = dbf["Deck"]["m_records"]["_items"];
                     for (var i = 0; i < starterDecks.Length; i++)
