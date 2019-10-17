@@ -2,11 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using HackF5.UnitySpy.HearthstoneLib.Detail;
     using JetBrains.Annotations;
 
-    internal static class DungeonInfoReader {
-
+    internal static class DungeonInfoReader
+    {
         public static IFullDungeonInfo GetFullDungeonInfo([NotNull] HearthstoneImage image)
         {
             if (image == null)
@@ -22,40 +23,162 @@
 
             return new FullDungeonInfo
             {
-                DungeonRun = BuildDungeonInfo((int)DungeonSaveKey.DUNGEON_RUN, savesMap),
-                MonsterHunt = BuildDungeonInfo((int)DungeonSaveKey.MONSTER_HUNT, savesMap),
-                RumbleRun = BuildDungeonInfo((int)DungeonSaveKey.RUMBLE_RUN, savesMap),
-                DalaranHeist = BuildDungeonInfo((int)DungeonSaveKey.DALARAN_HEIST, savesMap),
-                DalaranHeistHeroic = BuildDungeonInfo((int)DungeonSaveKey.DALANRA_HEIST_HEROIC, savesMap),
-                TombsOfTerror = BuildDungeonInfo((int)DungeonSaveKey.TOMBS_OF_TERROR, savesMap),
-                TombsOfTerrorHeroic = BuildDungeonInfo((int)DungeonSaveKey.TOMBS_OF_TERROR_HEROIC, savesMap),
+                DungeonRun = BuildDungeonInfo(image, (int)DungeonSaveKey.DUNGEON_RUN, savesMap),
+                MonsterHunt = BuildDungeonInfo(image, (int)DungeonSaveKey.MONSTER_HUNT, savesMap),
+                RumbleRun = BuildDungeonInfo(image, (int)DungeonSaveKey.RUMBLE_RUN, savesMap),
+                DalaranHeist = BuildDungeonInfo(image, (int)DungeonSaveKey.DALARAN_HEIST, savesMap),
+                DalaranHeistHeroic = BuildDungeonInfo(image, (int)DungeonSaveKey.DALANRA_HEIST_HEROIC, savesMap),
+                TombsOfTerror = BuildDungeonInfo(image, (int)DungeonSaveKey.TOMBS_OF_TERROR, savesMap),
+                TombsOfTerrorHeroic = BuildDungeonInfo(image, (int)DungeonSaveKey.TOMBS_OF_TERROR_HEROIC, savesMap),
             };
         }
 
-        private static DungeonInfo BuildDungeonInfo(int key, dynamic savesMap)
+        private static IDungeonInfo BuildDungeonInfo(HearthstoneImage image, int key, dynamic savesMap)
         {
             var index = GetKeyIndex(savesMap, key);
             if (index == -1)
             {
                 return null;
             }
+
+            var runFromMemory = new DungeonInfo
+            {
+                DeckCards = ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.DECK_LIST),
+                LootOptionBundles = new List<List<int>>()
+                {
+                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_1),
+                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_2),
+                    ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.LOOT_OPTION_3),
+                },
+                ChosenLoot = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.CHOSEN_LOOT),
+                TreasureOption = ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.TREASURE_OPTION),
+                ChosenTreasure = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.CHOSEN_TREASURE),
+                RunActive = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.RUN_ACTIVE),
+                SelectedDeck = ExtractValue(savesMap["valueSlots"][index], (int)DungeonFieldKey.SELECTED_DECK),
+            };
+            return EnrichDeck(image, runFromMemory);
+        }
+
+        private static IDungeonInfo EnrichDeck(HearthstoneImage image, DungeonInfo runFromMemory)
+        {
             return new DungeonInfo
             {
-                DeckList = ExtractValues(savesMap["valueSlots"][index], (int)DungeonFieldKey.DECK_LIST),
+                DeckCards = runFromMemory.DeckCards,
+                LootOptionBundles = runFromMemory.LootOptionBundles,
+                ChosenLoot = runFromMemory.ChosenLoot,
+                TreasureOption = runFromMemory.TreasureOption,
+                ChosenTreasure = runFromMemory.ChosenTreasure,
+                RunActive = runFromMemory.RunActive,
+                SelectedDeck = runFromMemory.SelectedDeck,
+                DeckList = BuildRealDeckList(image, runFromMemory),
             };
         }
 
-        private static IReadOnlyList<int> ExtractValues(dynamic dungeonMap, int key)
+        private static IReadOnlyList<int> BuildRealDeckList(HearthstoneImage image, DungeonInfo runFromMemory)
+        {
+            var deckList = new List<int>();
+
+            // The current run is in progress, which means the value held in the DeckCards
+            // field is the aggregation of the cards picked in the previous steps
+            // TODO: how to handle card changed / removed by Bob?
+            if (runFromMemory.RunActive == 1)
+            {
+                deckList = runFromMemory.DeckCards.ToList();
+                if (runFromMemory.ChosenLoot > 0)
+                {
+                    // index is 1-based
+                    var chosenBundle = runFromMemory.LootOptionBundles[runFromMemory.ChosenLoot - 1];
+
+                    // First card is the name of the bundle
+                    for (int i = 1; i < chosenBundle.Count; i++)
+                    {
+                        deckList.Add(chosenBundle[i]);
+                    }
+                }
+
+                if (runFromMemory.ChosenTreasure > 0)
+                {
+                    deckList.Add(runFromMemory.TreasureOption[runFromMemory.ChosenTreasure - 1]);
+                }
+            }
+            else
+            {
+                if (runFromMemory.SelectedDeck > 0)
+                {
+                    var dbf = image["GameDbf"];
+                    var starterDecks = dbf["Deck"]["m_records"]["_items"];
+                    for (int i = 0; i < starterDecks.Length; i++)
+                    {
+                        var deckId = starterDecks[i]["m_ID"];
+                        if (deckId == runFromMemory.SelectedDeck)
+                        {
+                            var topCardId = starterDecks[i]["m_topCardId"];
+                            var cardDbf = GetDeckCardDbf(image, topCardId);
+                            while (cardDbf != null)
+                            {
+                                deckList.Add(cardDbf["m_cardId"]);
+                                var next = cardDbf["m_nextCardId"];
+                                cardDbf = next == 0 ? null : GetDeckCardDbf(image, next);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return deckList;
+        }
+
+        private static dynamic GetDeckCardDbf(HearthstoneImage image, int cardId)
+        {
+            var cards = image["GameDbf"]["DeckCard"]["m_records"]["_items"];
+            for (int i = 0; i < cards.Length; i++)
+            {
+                if (cards[i]["m_ID"] == cardId)
+                {
+                    return cards[i];
+                }
+            }
+
+            return null;
+        }
+
+        private static int ExtractValue(dynamic dungeonMap, int key)
         {
             var keyIndex = GetKeyIndex(dungeonMap, key);
+            if (keyIndex == -1)
+            {
+                return -1;
+            }
+
             var value = dungeonMap["valueSlots"][keyIndex]["_IntValue"];
             var size = value["_size"];
             var items = value["_items"];
             List<int> result = new List<int>();
             for (int i = 0; i < size; i++)
             {
-                var cardDbfId = (int)items[i];
-                result.Add(cardDbfId);
+                var item = (int)items[i];
+                result.Add(item);
+            }
+
+            return result.Count > 0 ? result[0] : -1;
+        }
+
+        private static IReadOnlyList<int> ExtractValues(dynamic dungeonMap, int key)
+        {
+            var keyIndex = GetKeyIndex(dungeonMap, key);
+            if (keyIndex == -1)
+            {
+                return new List<int>();
+            }
+
+            var value = dungeonMap["valueSlots"][keyIndex]["_IntValue"];
+            var size = value["_size"];
+            var items = value["_items"];
+            List<int> result = new List<int>();
+            for (int i = 0; i < size; i++)
+            {
+                var item = (int)items[i];
+                result.Add(item);
             }
 
             return result;
@@ -74,6 +197,5 @@
 
             return -1;
         }
-
     }
 }
