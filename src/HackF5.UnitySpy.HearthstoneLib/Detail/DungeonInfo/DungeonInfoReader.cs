@@ -144,7 +144,8 @@
                 }
             }
 
-            return deckList;
+            // Some cards can be set to 0, when they are removed by Bob for instance
+            return deckList.Where(id => id > 0).ToList();
         }
 
         private static dynamic GetDeckCardDbf(HearthstoneImage image, int cardId)
