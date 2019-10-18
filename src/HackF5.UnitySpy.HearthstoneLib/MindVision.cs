@@ -6,7 +6,6 @@
     using System.Linq;
     using HackF5.UnitySpy.HearthstoneLib.Detail;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Collection;
-    using HackF5.UnitySpy.HearthstoneLib.Detail.Deck;
     using HackF5.UnitySpy.HearthstoneLib.Detail.DungeonInfo;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Match;
 
@@ -31,7 +30,5 @@
         public IFullDungeonInfo GetDungeonInfo() => DungeonInfoReader.GetFullDungeonInfo(this.Image);
 
         public IMatchInfo GetMatchInfo() => MatchReader.GetMatchInfo(this.Image);
-
-        public IDeck GetActiveDeck() => ActiveDeckReader.GetActiveDeck(this.Image);
     }
 }
