@@ -13,7 +13,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
         [TestMethod]
         public void TestRetrieveCollection()
         {
-            var collection = new MindVision().GetCollection();
+            var collection = new MindVision().GetCollectionCards();
             Assert.IsNotNull(collection);
             Assert.IsTrue(collection.Count > 0, "Collection should not be empty.");
             this.TestContext.WriteLine($"Collection has {collection.Count} cards.");
@@ -32,7 +32,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
         [TestMethod]
         public void TestRetrieveFullDungeonInfo()
         {
-            var dungeonInfo = new MindVision().GetDungeonInfo();
+            var dungeonInfo = new MindVision().GetDungeonInfoCollection();
             Assert.IsNotNull(dungeonInfo);
         }
     }

@@ -2,15 +2,15 @@
 {
     internal enum DungeonFieldKey
     {
-        DECK_LIST = 14,
-        LOOT_OPTION_1 = 23,
-        LOOT_OPTION_2 = 24,
-        LOOT_OPTION_3 = 25,
-        TREASURE_OPTION = 26,
-        RUN_ACTIVE = 81,
-        CHOSEN_LOOT = 101,
-        CHOSEN_TREASURE = 102,
-        SELECTED_DECK = 237,
-        STARTING_TREASURE = 443,
+        DeckList = 14,
+        LootOption1 = 23,
+        LootOption2 = 24,
+        LootOption3 = 25,
+        TreasureOption = 26,
+        RunActive = 81,
+        ChosenLoot = 101,
+        ChosenTreasure = 102,
+        SelectedDeck = 237,
+        StartingTreasure = 443,
     }
 }
