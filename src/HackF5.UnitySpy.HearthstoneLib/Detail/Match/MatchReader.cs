@@ -3,9 +3,9 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
 {
     using System;
 
-    internal static class MatchReader
+    internal static class MatchInfoReader
     {
-        public static MatchInfo GetMatchInfo(HearthstoneImage image)
+        public static IMatchInfo ReadMatchInfo(HearthstoneImage image)
         {
             var matchInfo = new MatchInfo();
             var gameState = image["GameState"]["s_instance"];
@@ -27,16 +27,16 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
                     var standardMedalInfo = medalInfo?["m_currMedalInfo"];
                     var wildMedalInfo = medalInfo?["m_currWildMedalInfo"];
                     var playerName = players[i]["m_name"];
-                    var standardRank = standardMedalInfo != null ? MatchReader.GetRankValue(image, standardMedalInfo) : 0;
+                    var standardRank = standardMedalInfo != null ? MatchInfoReader.GetRankValue(image, standardMedalInfo) : 0;
                     var standardLegendRank = standardMedalInfo?["legendIndex"] ?? 0;
-                    var wildRank = wildMedalInfo != null ? MatchReader.GetRankValue(image, wildMedalInfo) : 0;
+                    var wildRank = wildMedalInfo != null ? MatchInfoReader.GetRankValue(image, wildMedalInfo) : 0;
                     var wildLegendRank = wildMedalInfo?["legendIndex"] ?? 0;
                     var cardBack = players[i]["m_cardBackId"];
                     var playerId = playerIds[i];
                     var side = (Side)players[i]["m_side"];
                     var accountId = players[i]["m_gameAccountId"];
                     var account = new Account { Hi = accountId?["m_hi"] ?? 0, Lo = accountId?["m_lo"] ?? 0 };
-                    var battleTag = MatchReader.GetBattleTag(image, account);
+                    var battleTag = MatchInfoReader.GetBattleTag(image, account);
 
                     switch (side)
                     {
@@ -210,7 +210,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
         {
             var leagueId = medalInfo["leagueId"];
             var starLevel = medalInfo["starLevel"];
-            var leagueRankRecord = MatchReader.GetLeagueRankRecord(image, leagueId, starLevel);
+            var leagueRankRecord = MatchInfoReader.GetLeagueRankRecord(image, leagueId, starLevel);
             if (leagueRankRecord == null)
             {
                 return 0;

@@ -5,9 +5,9 @@
     using System.Linq;
     using JetBrains.Annotations;
 
-    internal static class CollectionReader
+    internal static class CollectionCardReader
     {
-        public static IReadOnlyList<ICollectionCard> GetCollection([NotNull] HearthstoneImage image)
+        public static IReadOnlyList<ICollectionCard> ReadCollection([NotNull] HearthstoneImage image)
         {
             if (image == null)
             {
