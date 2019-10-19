@@ -6,6 +6,8 @@
     [PublicAPI]
     public interface IDungeonInfo
     {
+        DungeonKey Key { get; }
+
         IReadOnlyList<int> DeckCards { get; }
 
         IReadOnlyList<int> DeckList { get; }
