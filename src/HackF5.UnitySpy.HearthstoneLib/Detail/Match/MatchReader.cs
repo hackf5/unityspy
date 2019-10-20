@@ -8,74 +8,73 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
         public static IMatchInfo ReadMatchInfo(HearthstoneImage image)
         {
             var matchInfo = new MatchInfo();
-            var gameState = image["GameState"]["s_instance"];
-            image.GetService("NetCache");
+            var gameState = image["GameState"]?["s_instance"];
             var netCacheValues = image.GetService("NetCache")?["m_netCache"]?["valueSlots"];
 
             if (gameState != null)
             {
-                var playerIds = gameState["m_playerMap"]["keySlots"];
-                var players = gameState["m_playerMap"]["valueSlots"];
+                var playerIds = gameState["m_playerMap"]?["keySlots"];
+                var players = gameState["m_playerMap"]?["valueSlots"];
                 for (var i = 0; i < playerIds.Length; i++)
                 {
-                    if (players[i]?.TypeDefinition.Name != "Player")
+                    if (players[i]?.TypeDefinition?.Name != "Player")
                     {
                         continue;
                     }
 
-                    var medalInfo = players[i]["m_medalInfo"];
+                    var medalInfo = players[i]?["m_medalInfo"];
                     var standardMedalInfo = medalInfo?["m_currMedalInfo"];
                     var wildMedalInfo = medalInfo?["m_currWildMedalInfo"];
-                    var playerName = players[i]["m_name"];
-                    var standardRank = standardMedalInfo != null ? MatchInfoReader.GetRankValue(image, standardMedalInfo) : 0;
+                    var playerName = players[i]?["m_name"];
+                    var standardRank = standardMedalInfo != null ? MatchInfoReader.GetRankValue(image, standardMedalInfo) : -1;
                     var standardLegendRank = standardMedalInfo?["legendIndex"] ?? 0;
-                    var wildRank = wildMedalInfo != null ? MatchInfoReader.GetRankValue(image, wildMedalInfo) : 0;
+                    var wildRank = wildMedalInfo != null ? MatchInfoReader.GetRankValue(image, wildMedalInfo) : -1;
                     var wildLegendRank = wildMedalInfo?["legendIndex"] ?? 0;
-                    var cardBack = players[i]["m_cardBackId"];
-                    var playerId = playerIds[i];
-                    var side = (Side)players[i]["m_side"];
-                    var accountId = players[i]["m_gameAccountId"];
+                    var cardBack = players[i]?["m_cardBackId"] ?? -1;
+                    var playerId = playerIds[i] ?? -1;
+                    var side = (Side)(players[i]?["m_side"] ?? 0);
+                    var accountId = players[i]?["m_gameAccountId"];
                     var account = new Account { Hi = accountId?["m_hi"] ?? 0, Lo = accountId?["m_lo"] ?? 0 };
                     var battleTag = MatchInfoReader.GetBattleTag(image, account);
 
                     switch (side)
                     {
                         case Side.FRIENDLY:
-                        {
-                            dynamic netCacheMedalInfo = null;
-                            if (netCacheValues != null)
                             {
-                                foreach (var netCache in netCacheValues)
+                                dynamic netCacheMedalInfo = null;
+                                if (netCacheValues != null)
                                 {
-                                    if (netCache?.TypeDefinition.Name != "NetCacheMedalInfo")
+                                    foreach (var netCache in netCacheValues)
                                     {
-                                        continue;
+                                        if (netCache?.TypeDefinition.Name != "NetCacheMedalInfo")
+                                        {
+                                            continue;
+                                        }
+
+                                        netCacheMedalInfo = netCache;
+                                        break;
                                     }
-
-                                    netCacheMedalInfo = netCache;
-                                    break;
                                 }
+
+                                var standardStars = netCacheMedalInfo?["<Standard>k__BackingField"]?["<Stars>k__BackingField"] ?? -1;
+                                var wildStars = netCacheMedalInfo?["<Wild>k__BackingField"]?["<Stars>k__BackingField"] ?? -1;
+                                matchInfo.LocalPlayer = new Player
+                                {
+                                    Id = playerId,
+                                    Name = playerName,
+                                    StandardRank = standardRank,
+                                    StandardLegendRank = standardLegendRank,
+                                    StandardStars = standardStars,
+                                    WildRank = wildRank,
+                                    WildLegendRank = wildLegendRank,
+                                    WildStars = wildStars,
+                                    CardBackId = cardBack,
+                                    Account = account,
+                                    BattleTag = battleTag,
+                                };
+
+                                break;
                             }
-
-                            var standardStars = netCacheMedalInfo?["<Standard>k__BackingField"]["<Stars>k__BackingField"];
-                            var wildStars = netCacheMedalInfo?["<Wild>k__BackingField"]["<Stars>k__BackingField"];
-                            matchInfo.LocalPlayer = new Player
-                            {
-                                Id = playerId,
-                                Name = playerName,
-                                StandardRank = standardRank,
-                                StandardLegendRank = standardLegendRank,
-                                StandardStars = standardStars,
-                                WildRank = wildRank,
-                                WildLegendRank = wildLegendRank,
-                                WildStars = wildStars,
-                                CardBackId = cardBack,
-                                Account = account,
-                                BattleTag = battleTag,
-                            };
-
-                            break;
-                        }
 
                         case Side.OPPOSING:
                             matchInfo.OpposingPlayer = new Player
@@ -84,10 +83,10 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
                                 Name = playerName,
                                 StandardRank = standardRank,
                                 StandardLegendRank = standardLegendRank,
-                                StandardStars = 0,
+                                StandardStars = -1,
                                 WildRank = wildRank,
                                 WildLegendRank = wildLegendRank,
-                                WildStars = 0,
+                                WildStars = -1,
                                 CardBackId = cardBack,
                                 Account = account,
                                 BattleTag = battleTag,
@@ -112,21 +111,21 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
             var gameMgr = image.GetService("GameMgr");
             if (gameMgr != null)
             {
-                matchInfo.MissionId = gameMgr["m_missionId"];
-                matchInfo.GameType = (GameType)gameMgr["m_gameType"];
-                matchInfo.FormatType = (GameFormat)gameMgr["m_formatType"];
+                matchInfo.MissionId = gameMgr["m_missionId"] ?? -1;
+                matchInfo.GameType = (GameType)(gameMgr["m_gameType"] ?? 0);
+                matchInfo.FormatType = (GameFormat)(gameMgr["m_formatType"] ?? 0);
             }
 
             if (netCacheValues != null)
             {
                 foreach (var netCache in netCacheValues)
                 {
-                    if (netCache?.TypeDefinition.Name != "NetCacheRewardProgress")
+                    if (netCache?.TypeDefinition?.Name != "NetCacheRewardProgress")
                     {
                         continue;
                     }
 
-                    matchInfo.RankedSeasonId = netCache["<Season>k__BackingField"];
+                    matchInfo.RankedSeasonId = netCache["<Season>k__BackingField"] ?? -1;
                     break;
                 }
             }
@@ -136,7 +135,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
 
         private static BattleTag GetBattleTag(HearthstoneImage image, IAccount account)
         {
-            var gameAccounts = image["BnetPresenceMgr"]["s_instance"]?["m_gameAccounts"];
+            var gameAccounts = image["BnetPresenceMgr"]?["s_instance"]?["m_gameAccounts"];
             if (gameAccounts == null)
             {
                 return null;
@@ -150,11 +149,11 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
                     continue;
                 }
 
-                var bTag = gameAccounts["valueSlots"][i]["m_battleTag"];
+                var bTag = gameAccounts["valueSlots"]?[i]?["m_battleTag"];
                 return new BattleTag
                 {
-                    Name = bTag["m_name"],
-                    Number = bTag["m_number"],
+                    Name = bTag?["m_name"],
+                    Number = bTag?["m_number"] ?? -1,
                 };
             }
 
@@ -163,7 +162,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
 
         private static dynamic GetLeagueRankRecord(HearthstoneImage image, int leagueId, int starLevel)
         {
-            var rankManager = image["RankMgr"]["s_instance"];
+            var rankManager = image["RankMgr"]?["s_instance"];
             if (rankManager == null)
             {
                 return null;
@@ -208,15 +207,15 @@ namespace HackF5.UnitySpy.HearthstoneLib.Detail.Match
 
         private static int GetRankValue(HearthstoneImage image, dynamic medalInfo)
         {
-            var leagueId = medalInfo["leagueId"];
-            var starLevel = medalInfo["starLevel"];
+            var leagueId = medalInfo?["leagueId"];
+            var starLevel = medalInfo?["starLevel"];
             var leagueRankRecord = MatchInfoReader.GetLeagueRankRecord(image, leagueId, starLevel);
             if (leagueRankRecord == null)
             {
                 return 0;
             }
 
-            var locValues = leagueRankRecord["m_medalText"]["m_locValues"]["_items"];
+            var locValues = leagueRankRecord["m_medalText"]?["m_locValues"]?["_items"];
             foreach (var value in locValues)
             {
                 if (value == null)
