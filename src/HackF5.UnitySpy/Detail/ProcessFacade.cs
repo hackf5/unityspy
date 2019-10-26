@@ -16,10 +16,12 @@
     {
         public ProcessFacade(int processId)
         {
-            this.Process = Process.GetProcessById(processId);
+            // We do this instead of Process.GetProcessById() to be able to control 
+            // the permissions we ask
+            this.Process = Native.GetProcessHandle(processId);
         }
 
-        public Process Process { get; }
+        public IntPtr Process { get; }
 
         public string ReadAsciiString(uint address, int maxSize = 1024)
         {
@@ -261,7 +263,7 @@
             {
                 var bufferPointer = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, Constants.NullPtr);
                 if (!ProcessFacade.ReadProcessMemory(
-                    this.Process.Handle,
+                    this.Process,
                     processAddress,
                     bufferPointer,
                     size ?? buffer.Length,

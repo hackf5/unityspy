@@ -82,7 +82,7 @@
             {
                 var moduleFilePath = new StringBuilder(1024);
                 var errorCode = Native.GetModuleFileNameEx(
-                    process.Process.Handle,
+                    process.Process,
                     modulePointer,
                     moduleFilePath,
                     (uint)moduleFilePath.Capacity);
@@ -94,7 +94,7 @@
 
                 var moduleName = Path.GetFileName(moduleFilePath.ToString());
                 Native.GetModuleInformation(
-                    process.Process.Handle,
+                    process.Process,
                     modulePointer,
                     out var moduleInformation,
                     (uint)(IntPtr.Size * modulePointers.Length));
