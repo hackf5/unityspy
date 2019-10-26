@@ -8,9 +8,6 @@
     {
         public ModuleInfo(string moduleName, IntPtr baseAddress, uint size)
         {
-            this.ModuleName = moduleName;
-            this.BaseAddress = baseAddress;
-            this.Size = size;
         }
 
         public IntPtr BaseAddress { get; }

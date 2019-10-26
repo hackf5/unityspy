@@ -17,28 +17,21 @@
         public FieldDefinition([NotNull] TypeDefinition declaringType, uint address)
             : base((declaringType ?? throw new ArgumentNullException(nameof(declaringType))).Image, address)
         {
-            this.DeclaringType = declaringType;
-            this.TypeInfo = new TypeInfo(declaringType.Image, this.ReadPtr(0x0));
-            this.Name = this.ReadString(0x4);
-            this.Offset = this.ReadInt32(0xc);
         }
 
-        ITypeDefinition IFieldDefinition.DeclaringType => this.DeclaringType;
+        ITypeDefinition IFieldDefinition.DeclaringType => null;
 
         public string Name { get; }
 
-        ITypeInfo IFieldDefinition.TypeInfo => this.TypeInfo;
+        ITypeInfo IFieldDefinition.TypeInfo => null;
 
-        public TypeDefinition DeclaringType { get; }
+        public ITypeDefinition DeclaringType { get; }
 
         public int Offset { get; set; }
 
-        public TypeInfo TypeInfo { get; }
-
         public TValue GetValue<TValue>(uint address)
         {
-            var offset = this.Offset - (this.DeclaringType.IsValueType ? 8 : 0);
-            return (TValue)this.TypeInfo.GetValue((uint)(address + offset));
+            return default(TValue);
         }
     }
 }

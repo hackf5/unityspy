@@ -6,26 +6,24 @@
     /// </summary>
     public abstract class MemoryObject : IMemoryObject
     {
-        protected MemoryObject(AssemblyImage image, uint address)
+        protected MemoryObject(IAssemblyImage image, uint address)
         {
-            this.Image = image;
-            this.Address = address;
         }
 
-        IAssemblyImage IMemoryObject.Image => this.Image;
+        IAssemblyImage IMemoryObject.Image => null;
 
-        public virtual AssemblyImage Image { get; }
+        public virtual IAssemblyImage Image { get; }
 
-        public virtual ProcessFacade Process => this.Image.Process;
+        public virtual ProcessFacade Process => null;
 
         protected uint Address { get; }
 
-        protected int ReadInt32(uint offset) => this.Process.ReadInt32(this.Address + offset);
+        protected int ReadInt32(uint offset) => 0;
 
-        protected uint ReadPtr(uint offset) => this.Process.ReadPtr(this.Address + offset);
+        protected uint ReadPtr(uint offset) => 0;
 
-        protected string ReadString(uint offset) => this.Process.ReadAsciiStringPtr(this.Address + offset);
+        protected string ReadString(uint offset) => null;
 
-        protected uint ReadUInt32(uint offset) => this.Process.ReadUInt32(this.Address + offset);
+        protected uint ReadUInt32(uint offset) => 0;
     }
 }

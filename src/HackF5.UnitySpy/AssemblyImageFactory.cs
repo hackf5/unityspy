@@ -7,7 +7,6 @@
     using System.Runtime.InteropServices;
     using System.Text;
     using HackF5.UnitySpy.Detail;
-    using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -30,118 +29,25 @@
         /// <returns>
         /// An <see cref="IAssemblyImage"/> that provides access into a Unity application's managed memory.
         /// </returns>
-        public static IAssemblyImage Create(int processId, string assemblyName = "Assembly-CSharp")
+        public static IAssemblyImage Create()
         {
-            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-            {
-                throw new InvalidOperationException(
-                    "This library reads data directly from a process's memory, so is platform specific "
-                    + "and only runs under Windows. It might be possible to get it running under macOS, but...");
-            }
-
-            var process = new ProcessFacade(processId);
-            var monoModule = AssemblyImageFactory.GetMonoModule(process);
-            var moduleDump = process.ReadModule(monoModule);
-            var rootDomainFunctionAddress = AssemblyImageFactory.GetRootDomainFunctionAddress(moduleDump, monoModule);
-
-            return AssemblyImageFactory.GetAssemblyImage(process, assemblyName, rootDomainFunctionAddress);
+            return null;
         }
 
-        private static AssemblyImage GetAssemblyImage(ProcessFacade process, string name, int rootDomainFunctionAddress)
+        private static IAssemblyImage GetAssemblyImage()
         {
-            var domainAddress = process.ReadPtr((uint)rootDomainFunctionAddress + 1);
-            //// pointer to struct of type _MonoDomain
-            var domain = process.ReadPtr(domainAddress);
-
-            //// pointer to array of structs of type _MonoAssembly
-            var assemblyArrayAddress = process.ReadPtr(domain + MonoLibraryOffsets.ReferencedAssemblies);
-            for (var assemblyAddress = assemblyArrayAddress;
-                assemblyAddress != Constants.NullPtr;
-                assemblyAddress = process.ReadPtr(assemblyAddress + 0x4))
-            {
-                var assembly = process.ReadPtr(assemblyAddress);
-                var assemblyNameAddress = process.ReadPtr(assembly + 0x8);
-                var assemblyName = process.ReadAsciiString(assemblyNameAddress);
-                if (assemblyName == name)
-                {
-                    return new AssemblyImage(process, process.ReadPtr(assembly + MonoLibraryOffsets.AssemblyImage));
-                }
-            }
-
-            throw new InvalidOperationException($"Unable to find assembly '{name}'");
+            return null;
         }
 
         // https://stackoverflow.com/questions/36431220/getting-a-list-of-dlls-currently-loaded-in-a-process-c-sharp
-        private static ModuleInfo GetMonoModule(ProcessFacade process)
+        private static ModuleInfo GetMonoModule()
         {
-            var modulePointers = Native.GetProcessModulePointers(process);
-
-            // Collect modules from the process
-            var modules = new List<ModuleInfo>();
-            foreach (var modulePointer in modulePointers)
-            {
-                var moduleFilePath = new StringBuilder(1024);
-                var errorCode = Native.GetModuleFileNameEx(
-                    process.Process,
-                    modulePointer,
-                    moduleFilePath,
-                    (uint)moduleFilePath.Capacity);
-
-                if (errorCode == 0)
-                {
-                    throw new COMException("Failed to get module file name.", Marshal.GetLastWin32Error());
-                }
-
-                var moduleName = Path.GetFileName(moduleFilePath.ToString());
-                Native.GetModuleInformation(
-                    process.Process,
-                    modulePointer,
-                    out var moduleInformation,
-                    (uint)(IntPtr.Size * modulePointers.Length));
-
-                // Convert to a normalized module and add it to our list
-                var module = new ModuleInfo(moduleName, moduleInformation.BaseOfDll, moduleInformation.SizeInBytes);
-                modules.Add(module);
-            }
-
-            return modules.FirstOrDefault(module => module.ModuleName == "mono.dll");
+            return null;
         }
 
-        private static int GetRootDomainFunctionAddress(byte[] moduleDump, ModuleInfo monoModuleInfo)
+        private static int GetRootDomainFunctionAddress()
         {
-            // offsets taken from https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
-            // ReSharper disable once CommentTypo
-            var startIndex = moduleDump.ToInt32(0x3c); // lfanew
-
-            var exportDirectoryIndex = startIndex + 0x78;
-            var exportDirectory = moduleDump.ToInt32(exportDirectoryIndex);
-
-            var numberOfFunctions = moduleDump.ToInt32(exportDirectory + 0x14);
-            var functionAddressArrayIndex = moduleDump.ToInt32(exportDirectory + 0x1c);
-            var functionNameArrayIndex = moduleDump.ToInt32(exportDirectory + 0x20);
-
-            var rootDomainFunctionAddress = Constants.NullPtr;
-            for (var functionIndex = Constants.NullPtr;
-                functionIndex < (numberOfFunctions * Constants.SizeOfPtr);
-                functionIndex += (int)Constants.SizeOfPtr)
-            {
-                var functionNameIndex = moduleDump.ToInt32(functionNameArrayIndex + functionIndex);
-                var functionName = moduleDump.ToAsciiString(functionNameIndex);
-                if (functionName == "mono_get_root_domain")
-                {
-                    rootDomainFunctionAddress = monoModuleInfo.BaseAddress.ToInt32()
-                        + moduleDump.ToInt32(functionAddressArrayIndex + functionIndex);
-
-                    break;
-                }
-            }
-
-            if (rootDomainFunctionAddress == Constants.NullPtr)
-            {
-                throw new InvalidOperationException("Failed to find mono_get_root_domain function.");
-            }
-
-            return rootDomainFunctionAddress;
+            return 0;
         }
     }
 }

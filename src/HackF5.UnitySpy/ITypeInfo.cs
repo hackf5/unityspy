@@ -25,7 +25,7 @@
         /// <summary>
         /// Gets a value that describes the type of the entity.
         /// </summary>
-        TypeCode TypeCode { get; }
+        int TypeCode { get; }
 
         /// <summary>
         /// Tries to get the <see cref="ITypeDefinition"/> that this type info refers to. If the return value is

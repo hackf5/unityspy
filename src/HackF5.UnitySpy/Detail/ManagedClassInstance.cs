@@ -12,25 +12,21 @@
     [PublicAPI]
     public class ManagedClassInstance : ManagedObjectInstance
     {
+#pragma warning disable CS0649 // Field 'ManagedClassInstance.definitionAddress' is never assigned to, and will always have its default value 0
+#pragma warning disable CS0169 // The field 'ManagedClassInstance.definitionAddress' is never used
         private readonly uint definitionAddress;
+#pragma warning restore CS0169 // The field 'ManagedClassInstance.definitionAddress' is never used
+#pragma warning restore CS0649 // Field 'ManagedClassInstance.definitionAddress' is never assigned to, and will always have its default value 0
 
+#pragma warning disable CS0169 // The field 'ManagedClassInstance.vtable' is never used
         private readonly uint vtable;
+#pragma warning restore CS0169 // The field 'ManagedClassInstance.vtable' is never used
 
-        public ManagedClassInstance([NotNull] AssemblyImage image, uint address)
+        public ManagedClassInstance([NotNull] IAssemblyImage image, uint address)
             : base(image, address)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            // the address of the class instance points directly back the the classes VTable
-            this.vtable = this.ReadPtr(0x0);
-
-            // The VTable points to the class definition itself.
-            this.definitionAddress = image.Process.ReadPtr(this.vtable);
         }
 
-        public override TypeDefinition TypeDefinition => this.Image.GetTypeDefinition(this.definitionAddress);
+        public override ITypeDefinition TypeDefinition => null;
     }
 }
