@@ -16,7 +16,7 @@
     {
         public ProcessFacade(int processId)
         {
-            // We do this instead of Process.GetProcessById() to be able to control 
+            // We do this instead of Process.GetProcessById() to be able to control
             // the permissions we ask
             this.Process = Native.GetProcessHandle(processId);
         }

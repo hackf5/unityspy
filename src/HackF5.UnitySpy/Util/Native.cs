@@ -10,6 +10,24 @@
         private const string PsApiDll = "psapi.dll";
         private const string KernelDll = "kernel32.dll";
 
+        [Flags]
+        public enum ProcessAccessFlags : uint
+        {
+            All = 0x001F0FFF,
+            Terminate = 0x00000001,
+            CreateThread = 0x00000002,
+            VirtualMemoryOperation = 0x00000008,
+            VirtualMemoryRead = 0x00000010,
+            VirtualMemoryWrite = 0x00000020,
+            DuplicateHandle = 0x00000040,
+            CreateProcess = 0x000000080,
+            SetQuota = 0x00000100,
+            SetInformation = 0x00000200,
+            QueryInformation = 0x00000400,
+            QueryLimitedInformation = 0x00001000,
+            Synchronize = 0x00100000,
+        }
+
         public static IntPtr GetProcessHandle(int processId)
         {
             return Native.OpenProcess(ProcessAccessFlags.VirtualMemoryRead | ProcessAccessFlags.QueryInformation, true, processId);
@@ -37,17 +55,6 @@
             return result;
         }
 
-        // https://stackoverflow.com/questions/36431220/getting-a-list-of-dlls-currently-loaded-in-a-process-c-sharp
-        [DllImport(Native.PsApiDll, SetLastError = true)]
-        private static extern bool EnumProcessModulesEx(
-            IntPtr hProcess,
-            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)] [In] [Out]
-            IntPtr[] lphModule,
-            int cb,
-            [MarshalAs(UnmanagedType.U4)] out int lpCbNeeded,
-            uint dwFilterFlag);
-
-
         [DllImport(Native.PsApiDll, SetLastError = true)]
         public static extern uint GetModuleFileNameEx(
             IntPtr hProcess,
@@ -66,27 +73,17 @@
         public static extern IntPtr OpenProcess(
             ProcessAccessFlags processAccess,
             bool bInheritHandle,
-            int processId
-        );
+            int processId);
 
-        [Flags]
-        public enum ProcessAccessFlags : uint
-        {
-            All = 0x001F0FFF,
-            Terminate = 0x00000001,
-            CreateThread = 0x00000002,
-            VirtualMemoryOperation = 0x00000008,
-            VirtualMemoryRead = 0x00000010,
-            VirtualMemoryWrite = 0x00000020,
-            DuplicateHandle = 0x00000040,
-            CreateProcess = 0x000000080,
-            SetQuota = 0x00000100,
-            SetInformation = 0x00000200,
-            QueryInformation = 0x00000400,
-            QueryLimitedInformation = 0x00001000,
-            Synchronize = 0x00100000
-        }
-
+        // https://stackoverflow.com/questions/36431220/getting-a-list-of-dlls-currently-loaded-in-a-process-c-sharp
+        [DllImport(Native.PsApiDll, SetLastError = true)]
+        private static extern bool EnumProcessModulesEx(
+            IntPtr hProcess,
+            [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U4)] [In] [Out]
+            IntPtr[] lphModule,
+            int cb,
+            [MarshalAs(UnmanagedType.U4)] out int lpCbNeeded,
+            uint dwFilterFlag);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct ModuleInformation
