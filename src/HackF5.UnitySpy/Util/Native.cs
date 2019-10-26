@@ -39,7 +39,7 @@
 
             // Determine number of modules
             if (!Native.EnumProcessModulesEx(
-                process.Process,
+                IntPtr.Zero,
                 modulePointers,
                 modulePointers.Length,
                 out var bytesNeeded,

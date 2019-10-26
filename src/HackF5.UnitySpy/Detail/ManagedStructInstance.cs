@@ -13,17 +13,10 @@
     public class ManagedStructInstance : ManagedObjectInstance
     {
         public ManagedStructInstance([NotNull] TypeDefinition typeDefinition, uint address)
-            : base((typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition))).Image, address)
+#pragma warning disable CS1061 // 'TypeDefinition' does not contain a definition for 'Image' and no accessible extension method 'Image' accepting a first argument of type 'TypeDefinition' could be found (are you missing a using directive or an assembly reference?)
+            : base(null, address)
+#pragma warning restore CS1061 // 'TypeDefinition' does not contain a definition for 'Image' and no accessible extension method 'Image' accepting a first argument of type 'TypeDefinition' could be found (are you missing a using directive or an assembly reference?)
         {
-            // value type pointers contain no type information as a significant performance optimization. in memory
-            // a value type is simply a contiguous sequence of bytes and it is up to the runtime to know how to
-            // interpret those bytes. if you take the example of a integer, then it makes sense why this is
-            // as if an integer needed an extra pointer that pointed back to the System.Int32 class then the size
-            // of each one would be doubled. presumably interoperability with native assemblies would also be
-            // completely scuppered.
-            this.TypeDefinition = typeDefinition;
         }
-
-        public override TypeDefinition TypeDefinition { get; }
     }
 }

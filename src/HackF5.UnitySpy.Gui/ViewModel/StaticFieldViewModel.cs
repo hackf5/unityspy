@@ -42,7 +42,7 @@
             {
                 try
                 {
-                    return this.field.DeclaringType.GetStaticValue<object>(this.Name);
+                    return null;
                 }
                 catch (Exception ex)
                 {

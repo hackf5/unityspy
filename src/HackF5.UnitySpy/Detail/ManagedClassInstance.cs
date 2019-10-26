@@ -12,25 +12,9 @@
     [PublicAPI]
     public class ManagedClassInstance : ManagedObjectInstance
     {
-        private readonly uint definitionAddress;
-
-        private readonly uint vtable;
-
         public ManagedClassInstance([NotNull] AssemblyImage image, uint address)
             : base(image, address)
         {
-            if (image == null)
-            {
-                throw new ArgumentNullException(nameof(image));
-            }
-
-            // the address of the class instance points directly back the the classes VTable
-            this.vtable = this.ReadPtr(0x0);
-
-            // The VTable points to the class definition itself.
-            this.definitionAddress = image.Process.ReadPtr(this.vtable);
         }
-
-        public override TypeDefinition TypeDefinition => this.Image.GetTypeDefinition(this.definitionAddress);
     }
 }

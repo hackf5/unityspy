@@ -10,19 +10,5 @@
     [PublicAPI]
     public interface IFieldDefinition : IMemoryObject
     {
-        /// <summary>
-        /// Gets the name of the field.
-        /// </summary>
-        string Name { get; }
-
-        /// <summary>
-        /// Gets the <see cref="ITypeDefinition"/> of the type in which the field is declared.
-        /// </summary>
-        ITypeDefinition DeclaringType { get; }
-
-        /// <summary>
-        /// Gets an object that describes type information about field.
-        /// </summary>
-        ITypeInfo TypeInfo { get; }
     }
 }

@@ -9,56 +9,6 @@ namespace HackF5.UnitySpy.Detail
     /// </summary>
     public enum TypeCode
     {
-        END = 0x00,         /* End of List */
-        VOID = 0x01,
-
-        [Description("bool")]
-        BOOLEAN = 0x02,
-
-        [Description("char")]
-        CHAR = 0x03,
-
-        [Description("byte")]
-        I1 = 0x04,
-
-        [Description("sbyte")]
-        U1 = 0x05,
-
-        [Description("short")]
-        I2 = 0x06,
-
-        [Description("ushort")]
-        U2 = 0x07,
-
-        [Description("int")]
-        I4 = 0x08,
-
-        [Description("uint")]
-        U4 = 0x09,
-
-        [Description("long")]
-        I8 = 0x0a,
-
-        [Description("ulong")]
-        U8 = 0x0b,
-
-        [Description("float")]
-        R4 = 0x0c,
-
-        [Description("double")]
-        R8 = 0x0d,
-
-        [Description("string")]
-        STRING = 0x0e,
-        PTR = 0x0f,         /* arg: <type> token */
-        BYREF = 0x10,       /* arg: <type> token */
-        VALUETYPE = 0x11,   /* arg: <type> token */
-        CLASS = 0x12,       /* arg: <type> token */
-        VAR = 0x13,         /* number */
-        ARRAY = 0x14,       /* type, rank, boundsCount, bound1, loCount, lo1 */
-        GENERICINST = 0x15, /* <type> <type-arg-count> <type-1> \x{2026} <type-n> */
-        TYPEDBYREF = 0x16,
-
         [Description("int")]
         I = 0x18,
 
