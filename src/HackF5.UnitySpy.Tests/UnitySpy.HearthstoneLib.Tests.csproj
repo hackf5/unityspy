@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HackF5.UnitySpy.HearthstoneLib\HackF5.UnitySpy.HearthstoneLib.csproj" />
+    <ProjectReference Include="..\HackF5.UnitySpy.HearthstoneLib\UnitySpy.HearthstoneLib.csproj" />
   </ItemGroup>
 
 </Project>

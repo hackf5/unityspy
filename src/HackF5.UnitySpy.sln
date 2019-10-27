@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackF5.UnitySpy", "HackF5.UnitySpy\HackF5.UnitySpy.csproj", "{7207C1B6-4688-418E-A590-380C9488260F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitySpy", "HackF5.UnitySpy\UnitySpy.csproj", "{7207C1B6-4688-418E-A590-380C9488260F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{DD3559B1-4C0B-4EB9-82DB-DB0E82FDEC64}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,11 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{DD35
 		rules.ruleset = rules.ruleset
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackF5.UnitySpy.Gui", "HackF5.UnitySpy.Gui\HackF5.UnitySpy.Gui.csproj", "{53214F8D-8702-490D-930D-6DA45DBEBD85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitySpy.Gui", "HackF5.UnitySpy.Gui\UnitySpy.Gui.csproj", "{53214F8D-8702-490D-930D-6DA45DBEBD85}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackF5.UnitySpy.HearthstoneLib.Tests", "HackF5.UnitySpy.Tests\HackF5.UnitySpy.HearthstoneLib.Tests.csproj", "{1D5B71A2-9B4B-4772-A53B-B3BCB3242547}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitySpy.HearthstoneLib.Tests", "HackF5.UnitySpy.Tests\UnitySpy.HearthstoneLib.Tests.csproj", "{1D5B71A2-9B4B-4772-A53B-B3BCB3242547}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HackF5.UnitySpy.HearthstoneLib", "HackF5.UnitySpy.HearthstoneLib\HackF5.UnitySpy.HearthstoneLib.csproj", "{2AB0622D-919B-4CD1-85E1-7E02B6EB16D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitySpy.HearthstoneLib", "HackF5.UnitySpy.HearthstoneLib\UnitySpy.HearthstoneLib.csproj", "{2AB0622D-919B-4CD1-85E1-7E02B6EB16D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
