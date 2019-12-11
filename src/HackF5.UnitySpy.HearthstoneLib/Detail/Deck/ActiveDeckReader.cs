@@ -77,12 +77,14 @@
                 case 3189:
                 case 3190:
                 case 3191:
+                case 3236:
                     return dungeonInfo?[DungeonKey.DalaranHeist]?.DeckList;
                 case 3328:
                 case 3329:
                 case 3330:
                 case 3331:
                 case 3332:
+                case 3359:
                     return dungeonInfo?[DungeonKey.DalaranHeistHeroic]?.DeckList;
                 case 3428:
                 case 3429:
