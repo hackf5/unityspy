@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.Linq;
     using HackF5.UnitySpy.HearthstoneLib.Detail;
+    using HackF5.UnitySpy.HearthstoneLib.Detail.Battlegrounds;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Collection;
     using HackF5.UnitySpy.HearthstoneLib.Detail.Deck;
     using HackF5.UnitySpy.HearthstoneLib.Detail.DungeonInfo;
@@ -29,6 +30,8 @@
         public IReadOnlyList<ICollectionCard> GetCollectionCards() => CollectionCardReader.ReadCollection(this.image);
 
         public IDungeonInfoCollection GetDungeonInfoCollection() => DungeonInfoReader.ReadCollection(this.image);
+
+        public IBattlegroundsInfo GetBattlegroundsInfo() => BattlegroundsInfoReader.ReadBattlegroundsInfo(this.image);
 
         public IMatchInfo GetMatchInfo() => MatchInfoReader.ReadMatchInfo(this.image);
 
