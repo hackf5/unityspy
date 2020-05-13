@@ -104,7 +104,7 @@
                 modules.Add(module);
             }
 
-            return modules.FirstOrDefault(module => module.ModuleName == "mono.dll");
+            return modules.FirstOrDefault(module => module.ModuleName == "mono-2.0-bdwgc.dll");
         }
 
         private static int GetRootDomainFunctionAddress(byte[] moduleDump, ModuleInfo monoModuleInfo)
