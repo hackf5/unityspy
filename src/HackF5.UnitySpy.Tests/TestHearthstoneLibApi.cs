@@ -2,6 +2,9 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
 {
     using JetBrains.Annotations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
 
     // This needs to be run while Hearthstone is running
     [TestClass]
@@ -34,6 +37,22 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
         {
             var dungeonInfo = new MindVision().GetDungeonInfoCollection();
             Assert.IsNotNull(dungeonInfo);
+        }
+
+        [TestMethod]
+        public void MyTestMethod()
+        {
+            var process = Process.GetProcessesByName("Hearthstone").FirstOrDefault();
+            if (process == null)
+            {
+                throw new InvalidOperationException(
+                    "Failed to find Hearthstone executable. Please check that Hearthstone is running.");
+            }
+
+            var image = AssemblyImageFactory.Create(process.Id);
+            var type = image.GetTypeDefinition("CollectionManager");
+            var instance = type.GetStaticValue<IManagedObjectInstance>("s_instance");
+            var cards = instance.GetValue<IManagedObjectInstance>("m_collectibleCards");
         }
     }
 }

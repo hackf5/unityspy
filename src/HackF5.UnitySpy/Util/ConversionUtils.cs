@@ -29,5 +29,7 @@
         public static float ToSingle(this byte[] buffer) => BitConverter.ToSingle(buffer, 0);
 
         public static double ToDouble(this byte[] buffer) => BitConverter.ToDouble(buffer, 0);
+
+        public static byte ToByte(this byte[] buffer) => buffer[0];
     }
 }

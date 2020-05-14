@@ -153,6 +153,11 @@
             return this.ReadBufferValue(address, sizeof(uint), b => b.ToUInt32());
         }
 
+        public byte ReadByte(uint address)
+        {
+            return this.ReadBufferValue(address, sizeof(byte), b => b.ToByte());
+        }
+
         [DllImport("kernel32", SetLastError = true)]
         private static extern bool ReadProcessMemory(
             IntPtr hProcess,

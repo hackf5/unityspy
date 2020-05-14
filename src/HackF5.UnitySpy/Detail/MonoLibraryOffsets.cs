@@ -37,5 +37,13 @@ namespace HackF5.UnitySpy.Detail
         public const uint TypeDefinitionRuntimeInfoDomainVtables = 0x4;
 
         public const uint ReferencedAssemblies = 0x6c;
+
+        public const uint TypeDefinitionVTableSize = 0x38;
+
+        public const uint TypeDefinitionClassKind = 0x1e;
+
+        public const uint TypeDefinitionSizeOf = 0x94;
+
+        public const uint VTable = 0x28;
     }
 }
