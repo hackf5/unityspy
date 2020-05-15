@@ -66,9 +66,9 @@
 
         public string FullName => this.lazyFullName.Value;
 
-        public bool IsEnum => (this.bitFields & 0x10) == 0x10;
+        public bool IsEnum => (this.bitFields & 0x8) == 0x8;
 
-        public bool IsValueType => (this.bitFields & 0x8) == 0x8;
+        public bool IsValueType => (this.bitFields & 0x4) == 0x4;
 
         public string Name { get; }
 
@@ -135,8 +135,6 @@
 
         private IReadOnlyList<FieldDefinition> GetFields()
         {
-            // This looks like it has changed for generic types.
-
             var firstField = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionFields);
             if (firstField == Constants.NullPtr)
             {
@@ -144,15 +142,22 @@
             }
 
             var fields = new List<FieldDefinition>();
-            for (var fieldIndex = 0u; fieldIndex < this.fieldCount; fieldIndex++)
+            if (this.ClassKind == MonoClassKind.GInst)
             {
-                var field = firstField + (fieldIndex * 0x10);
-                if (this.Process.ReadPtr(field) == Constants.NullPtr)
+                fields.AddRange(this.GetGeneric().GetFields());
+            }
+            else
+            {
+                for (var fieldIndex = 0u; fieldIndex < this.fieldCount; fieldIndex++)
                 {
-                    break;
-                }
+                    var field = firstField + (fieldIndex * MonoLibraryOffsets.TypeDefinitionFieldSize);
+                    if (this.Process.ReadPtr(field) == Constants.NullPtr)
+                    {
+                        break;
+                    }
 
-                fields.Add(new FieldDefinition(this, field));
+                    fields.Add(new FieldDefinition(this, field));
+                }
             }
 
             fields.AddRange(this.Parent?.Fields ?? Array.Empty<FieldDefinition>());

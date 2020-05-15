@@ -53,6 +53,7 @@ namespace HackF5.UnitySpy.HearthstoneLib.Tests
             var type = image.GetTypeDefinition("CollectionManager");
             var instance = type.GetStaticValue<IManagedObjectInstance>("s_instance");
             var cards = instance.GetValue<IManagedObjectInstance>("m_collectibleCards");
+            var other = cards;
         }
     }
 }

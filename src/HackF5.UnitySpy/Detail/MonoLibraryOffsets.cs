@@ -20,6 +20,8 @@ namespace HackF5.UnitySpy.Detail
 
         public const uint TypeDefinitionFields = 0x60;
 
+        public const uint TypeDefinitionFieldSize = 0x10;
+
         public const uint TypeDefinitionName = 0x2c;
 
         public const uint TypeDefinitionNamespace = 0x30;
