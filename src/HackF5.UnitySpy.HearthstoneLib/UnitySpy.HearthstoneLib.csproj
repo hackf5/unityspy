@@ -7,13 +7,8 @@
     <LangVersion>latest</LangVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\HackF5.UnitySpy.snk</AssemblyOriginatorKeyFile>
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\HackF5.UnitySpy.Gui\HackF5.UnitySpy.Gui.csproj" />
-    <ProjectReference Include="..\HackF5.UnitySpy\HackF5.UnitySpy.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Jetbrains.Annotations" Version="2019.1.1" />
@@ -26,6 +21,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HackF5.UnitySpy\UnitySpy.csproj" />
   </ItemGroup>
 
 </Project>

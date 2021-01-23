@@ -217,9 +217,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HackF5.UnitySpy\HackF5.UnitySpy.csproj">
+    <ProjectReference Include="..\HackF5.UnitySpy\UnitySpy.csproj">
       <Project>{7207c1b6-4688-418e-a590-380c9488260f}</Project>
-      <Name>HackF5.UnitySpy</Name>
+      <Name>UnitySpy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
