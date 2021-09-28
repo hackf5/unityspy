@@ -47,14 +47,14 @@
             return AssemblyImageFactory.GetAssemblyImage(process, assemblyName, rootDomainFunctionAddress);
         }
 
-        private static AssemblyImage GetAssemblyImage(ProcessFacade process, string name, int rootDomainFunctionAddress)
+        private static AssemblyImage GetAssemblyImage(ProcessFacade process, string name, IntPtr rootDomainFunctionAddress)
         {
-            var domainAddress = process.ReadPtr((uint)rootDomainFunctionAddress + 1);
+            var domainAddress = process.ReadPtr(rootDomainFunctionAddress + 1);
             //// pointer to struct of type _MonoDomain
             var domain = process.ReadPtr(domainAddress);
 
             //// pointer to array of structs of type _MonoAssembly
-            var assemblyArrayAddress = process.ReadPtr(domain + MonoLibraryOffsets.ReferencedAssemblies);
+            var assemblyArrayAddress = process.ReadPtr(domain + process.MonoLibraryOffsets.ReferencedAssemblies);
             for (var assemblyAddress = assemblyArrayAddress;
                 assemblyAddress != Constants.NullPtr;
                 assemblyAddress = process.ReadPtr(assemblyAddress + 0x4))
@@ -64,7 +64,7 @@
                 var assemblyName = process.ReadAsciiString(assemblyNameAddress);
                 if (assemblyName == name)
                 {
-                    return new AssemblyImage(process, process.ReadPtr(assembly + MonoLibraryOffsets.AssemblyImage));
+                    return new AssemblyImage(process, process.ReadPtr(assembly + process.MonoLibraryOffsets.AssemblyImage));
                     //return new AssemblyImage(process, process.ReadPtr(assembly + 0x44)); -> CollectionManager is null if we have this
                     //return new AssemblyImage(process, process.ReadPtr(assembly + 0x54)); -> CollectionManager is null if we have this
                     //return new AssemblyImage(process, process.ReadPtr(assembly + 0x6c)); -> CollectionManager is null if we have this
@@ -112,7 +112,7 @@
             return modules.FirstOrDefault(module => module.ModuleName == "mono-2.0-bdwgc.dll");
         }
 
-        private static int GetRootDomainFunctionAddress(byte[] moduleDump, ModuleInfo monoModuleInfo)
+        private static IntPtr GetRootDomainFunctionAddress(byte[] moduleDump, ModuleInfo monoModuleInfo)
         {
             // offsets taken from https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
             // ReSharper disable once CommentTypo
@@ -125,16 +125,18 @@
             var functionAddressArrayIndex = moduleDump.ToInt32(exportDirectory + 0x1c);
             var functionNameArrayIndex = moduleDump.ToInt32(exportDirectory + 0x20);
 
+            var sizeOfFuntionEntry = 4;
+
             var rootDomainFunctionAddress = Constants.NullPtr;
-            for (var functionIndex = Constants.NullPtr;
-                functionIndex < (numberOfFunctions * Constants.SizeOfPtr);
-                functionIndex += (int)Constants.SizeOfPtr)
+            for (var functionIndex = 0;
+                functionIndex < (numberOfFunctions * sizeOfFuntionEntry);
+                functionIndex += sizeOfFuntionEntry)
             {
                 var functionNameIndex = moduleDump.ToInt32(functionNameArrayIndex + functionIndex);
                 var functionName = moduleDump.ToAsciiString(functionNameIndex);
                 if (functionName == "mono_get_root_domain")
                 {
-                    rootDomainFunctionAddress = monoModuleInfo.BaseAddress.ToInt32()
+                    rootDomainFunctionAddress = monoModuleInfo.BaseAddress
                         + moduleDump.ToInt32(functionAddressArrayIndex + functionIndex);
 
                     break;

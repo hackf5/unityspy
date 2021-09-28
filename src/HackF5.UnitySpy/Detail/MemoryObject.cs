@@ -1,4 +1,6 @@
-﻿namespace HackF5.UnitySpy.Detail
+﻿using System;
+
+namespace HackF5.UnitySpy.Detail
 {
     /// <summary>
     /// The base type for all objects accessed in a process' memory. Every object has an address in memory
@@ -6,13 +8,13 @@
     /// </summary>
     public abstract class MemoryObject : IMemoryObject
     {
-        protected MemoryObject(AssemblyImage image, uint address)
+        protected MemoryObject(AssemblyImage image, IntPtr address)
         {
             this.Image = image;
             this.Address = address;
         }
 
-        public uint GetAddress()
+        public IntPtr GetAddress()
         {
             return this.Address;
         }
@@ -23,16 +25,16 @@
 
         public virtual ProcessFacade Process => this.Image.Process;
 
-        protected uint Address { get; }
+        protected IntPtr Address { get; }
 
-        protected int ReadInt32(uint offset) => this.Process.ReadInt32(this.Address + offset);
+        protected int ReadInt32(int offset) => this.Process.ReadInt32(this.Address + offset);
 
-        protected uint ReadPtr(uint offset) => this.Process.ReadPtr(this.Address + offset);
+        protected IntPtr ReadPtr(int offset) => this.Process.ReadPtr(this.Address + offset);
 
-        protected string ReadString(uint offset) => this.Process.ReadAsciiStringPtr(this.Address + offset);
+        protected string ReadString(int offset) => this.Process.ReadAsciiStringPtr(this.Address + offset);
 
-        protected uint ReadUInt32(uint offset) => this.Process.ReadUInt32(this.Address + offset);
+        protected uint ReadUInt32(int offset) => this.Process.ReadUInt32(this.Address + offset);
 
-        protected byte ReadByte(uint offset) => this.Process.ReadByte(this.Address + offset);
+        protected byte ReadByte(int offset) => this.Process.ReadByte(this.Address + offset);
     }
 }

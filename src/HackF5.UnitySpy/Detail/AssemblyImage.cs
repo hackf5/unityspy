@@ -18,9 +18,9 @@
         private readonly Dictionary<string, TypeDefinition> typeDefinitionsByFullName =
             new Dictionary<string, TypeDefinition>();
 
-        private readonly ConcurrentDictionary<uint, TypeDefinition> typeDefinitionsByAddress;
+        private readonly ConcurrentDictionary<IntPtr, TypeDefinition> typeDefinitionsByAddress;
 
-        public AssemblyImage(ProcessFacade process, uint address)
+        public AssemblyImage(ProcessFacade process, IntPtr address)
             : base(null, address)
         {
             this.Process = process;
@@ -65,7 +65,7 @@
         public TypeDefinition GetTypeDefinition(string fullTypeName) =>
             this.typeDefinitionsByFullName.TryGetValue(fullTypeName, out var d) ? d : default;
 
-        public TypeDefinition GetTypeDefinition(uint address)
+        public TypeDefinition GetTypeDefinition(IntPtr address)
         {
             if (address == Constants.NullPtr)
             {
@@ -77,21 +77,21 @@
                 key => new TypeDefinition(this, key));
         }
 
-        private ConcurrentDictionary<uint, TypeDefinition> CreateTypeDefinitions()
+        private ConcurrentDictionary<IntPtr, TypeDefinition> CreateTypeDefinitions()
         {
-            var definitions = new ConcurrentDictionary<uint, TypeDefinition>();
+            var definitions = new ConcurrentDictionary<IntPtr, TypeDefinition>();
 
-            const uint classCache = MonoLibraryOffsets.ImageClassCache;
-            var classCacheSize = this.ReadUInt32(classCache + MonoLibraryOffsets.HashTableSize);
-            var classCacheTableArray = this.ReadPtr(classCache + MonoLibraryOffsets.HashTableTable);
+            int classCache = this.Process.MonoLibraryOffsets.ImageClassCache;
+            var classCacheSize = this.ReadUInt32(classCache + this.Process.MonoLibraryOffsets.HashTableSize);
+            var classCacheTableArray = this.ReadPtr(classCache + this.Process.MonoLibraryOffsets.HashTableTable);
 
-            for (var tableItem = 0u;
-                tableItem < (classCacheSize * Constants.SizeOfPtr);
-                tableItem += Constants.SizeOfPtr)
+            for (var tableItem = 0;
+                tableItem < (classCacheSize * this.Process.SizeOfPtr);
+                tableItem += this.Process.SizeOfPtr)
             {
                 for (var definition = this.Process.ReadPtr(classCacheTableArray + tableItem);
                     definition != Constants.NullPtr;
-                    definition = this.Process.ReadPtr(definition + MonoLibraryOffsets.TypeDefinitionNextClassCache))
+                    definition = this.Process.ReadPtr(definition + this.Process.MonoLibraryOffsets.TypeDefinitionNextClassCache))
                 {
                     definitions.GetOrAdd(definition, new TypeDefinition(this, definition));
                 }

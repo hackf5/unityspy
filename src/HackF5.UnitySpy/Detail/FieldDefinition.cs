@@ -14,7 +14,7 @@
         "Field: {" + nameof(FieldDefinition.Offset) + "} - {" + nameof(FieldDefinition.Name) + "}")]
     public class FieldDefinition : MemoryObject, IFieldDefinition
     {
-        public FieldDefinition([NotNull] TypeDefinition declaringType, uint address)
+        public FieldDefinition([NotNull] TypeDefinition declaringType, IntPtr address)
             : base((declaringType ?? throw new ArgumentNullException(nameof(declaringType))).Image, address)
         {
             this.DeclaringType = declaringType;
@@ -35,10 +35,10 @@
 
         public TypeInfo TypeInfo { get; }
 
-        public TValue GetValue<TValue>(uint address)
+        public TValue GetValue<TValue>(IntPtr address)
         {
             var offset = this.Offset - (this.DeclaringType.IsValueType ? 8 : 0);
-            return (TValue)this.TypeInfo.GetValue((uint)(address + offset));
+            return (TValue)this.TypeInfo.GetValue(address + offset);
         }
     }
 }

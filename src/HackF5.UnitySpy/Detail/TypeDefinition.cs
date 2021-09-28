@@ -36,7 +36,7 @@
 
         private readonly Lazy<TypeDefinition> lazyGeneric;
 
-        public TypeDefinition([NotNull] AssemblyImage image, uint address)
+        public TypeDefinition([NotNull] AssemblyImage image, IntPtr address)
             : base(image, address)
         {
             if (image == null)
@@ -44,22 +44,22 @@
                 throw new ArgumentNullException(nameof(image));
             }
 
-            this.bitFields = this.ReadUInt32(MonoLibraryOffsets.TypeDefinitionBitFields);
-            this.fieldCount = this.ReadInt32(MonoLibraryOffsets.TypeDefinitionFieldCount);
-            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(MonoLibraryOffsets.TypeDefinitionParent));
-            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(MonoLibraryOffsets.TypeDefinitionNestedIn));
+            this.bitFields = this.ReadUInt32(image.Process.MonoLibraryOffsets.TypeDefinitionBitFields);
+            this.fieldCount = this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionFieldCount);
+            this.lazyParent = new Lazy<TypeDefinition>(() => this.GetClassDefinition(image.Process.MonoLibraryOffsets.TypeDefinitionParent));
+            this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(image.Process.MonoLibraryOffsets.TypeDefinitionNestedIn));
             this.lazyFullName = new Lazy<string>(this.GetFullName);
             this.lazyFields = new Lazy<IReadOnlyList<FieldDefinition>>(this.GetFields);
             this.lazyGeneric = new Lazy<TypeDefinition>(this.GetGeneric);
 
-            this.Name = this.ReadString(MonoLibraryOffsets.TypeDefinitionName);
-            this.NamespaceName = this.ReadString(MonoLibraryOffsets.TypeDefinitionNamespace);
-            this.Size = this.ReadInt32(MonoLibraryOffsets.TypeDefinitionSize);
-            var vtablePtr = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
-            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVtables);
-            this.TypeInfo = new TypeInfo(image, this.Address + MonoLibraryOffsets.TypeDefinitionByValArg);
-            this.VTableSize = vtablePtr == Constants.NullPtr ? Constants.NullPtr : this.ReadInt32(MonoLibraryOffsets.TypeDefinitionVTableSize);
-            this.ClassKind = (MonoClassKind)(this.ReadByte(MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
+            this.Name = this.ReadString(image.Process.MonoLibraryOffsets.TypeDefinitionName);
+            this.NamespaceName = this.ReadString(image.Process.MonoLibraryOffsets.TypeDefinitionNamespace);
+            this.Size = this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionSize);
+            var vtablePtr = this.ReadPtr(image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
+            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVtables);
+            this.TypeInfo = new TypeInfo(image, this.Address + image.Process.MonoLibraryOffsets.TypeDefinitionByValArg);
+            this.VTableSize = vtablePtr == Constants.NullPtr ? 0 : this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionVTableSize);
+            this.ClassKind = (MonoClassKind)(this.ReadByte(image.Process.MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
         }
 
         IReadOnlyList<IFieldDefinition> ITypeDefinition.Fields => this.Fields;
@@ -86,7 +86,7 @@
 
         public TypeInfo TypeInfo { get; }
 
-        public uint VTable { get; }
+        public IntPtr VTable { get; }
 
         public int VTableSize { get; }
 
@@ -114,7 +114,7 @@
 
             try
             {
-                return field.GetValue<TValue>(this.Process.ReadPtr(this.VTable + MonoLibraryOffsets.VTable + (uint)(4 * this.VTableSize)));
+                return field.GetValue<TValue>(this.Process.ReadPtr(this.VTable + this.Process.MonoLibraryOffsets.VTable + 4 * this.VTableSize));
             } 
             catch (Exception e)
             {
@@ -137,12 +137,12 @@
             this.Parent?.Init();
         }
 
-        private TypeDefinition GetClassDefinition(uint address) =>
+        private TypeDefinition GetClassDefinition(int address) =>
             this.Image.GetTypeDefinition(this.ReadPtr(address));
 
         private IReadOnlyList<FieldDefinition> GetFields()
         {
-            var firstField = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionFields);
+            var firstField = this.ReadPtr(this.Image.Process.MonoLibraryOffsets.TypeDefinitionFields);
             if (firstField == Constants.NullPtr)
             {
                 return this.Parent?.Fields ?? new List<FieldDefinition>();
@@ -155,9 +155,9 @@
             }
             else
             {
-                for (var fieldIndex = 0u; fieldIndex < this.fieldCount; fieldIndex++)
+                for (var fieldIndex = 0; fieldIndex < this.fieldCount; fieldIndex++)
                 {
-                    var field = firstField + (fieldIndex * MonoLibraryOffsets.TypeDefinitionFieldSize);
+                    var field = firstField + (fieldIndex * this.Process.MonoLibraryOffsets.TypeDefinitionFieldSize);
                     if (this.Process.ReadPtr(field) == Constants.NullPtr)
                     {
                         break;
@@ -210,7 +210,8 @@
                 return null;
             }
 
-            return this.Image.GetTypeDefinition(this.Image.Process.ReadPtr(this.ReadPtr(MonoLibraryOffsets.TypeDefinitionSizeOf)));
+            var genericContainerPtr = this.ReadPtr(this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer);
+            return this.Image.GetTypeDefinition(this.Process.ReadPtr(genericContainerPtr));
         }
     }
 }

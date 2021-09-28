@@ -1,4 +1,6 @@
-﻿namespace HackF5.UnitySpy.Detail
+﻿using System;
+
+namespace HackF5.UnitySpy.Detail
 {
     using JetBrains.Annotations;
 
@@ -10,16 +12,16 @@
     [PublicAPI]
     public class TypeInfo : MemoryObject, ITypeInfo
     {
-        public TypeInfo(AssemblyImage image, uint address)
+        public TypeInfo(AssemblyImage image, IntPtr address)
             : base(image, address)
         {
-            this.Data = this.ReadUInt32(0x0);
-            this.Attrs = this.ReadUInt32(0x4);
+            this.Data = this.ReadPtr(0x0);
+            this.Attrs = this.ReadUInt32(this.Process.SizeOfPtr);
         }
 
         public uint Attrs { get; }
 
-        public uint Data { get; }
+        public IntPtr Data { get; }
 
         public bool IsStatic => (this.Attrs & 0x10) == 0x10;
 
@@ -43,6 +45,6 @@
             }
         }
 
-        public object GetValue(uint address) => this.Process.ReadManaged(this, address);
+        public object GetValue(IntPtr address) => this.Process.ReadManaged(this, address);
     }
 }

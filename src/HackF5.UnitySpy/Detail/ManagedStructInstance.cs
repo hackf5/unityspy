@@ -12,7 +12,7 @@
     [PublicAPI]
     public class ManagedStructInstance : ManagedObjectInstance
     {
-        public ManagedStructInstance([NotNull] TypeDefinition typeDefinition, uint address)
+        public ManagedStructInstance([NotNull] TypeDefinition typeDefinition, IntPtr address)
             : base((typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition))).Image, address)
         {
             // value type pointers contain no type information as a significant performance optimization. in memory
