@@ -12,6 +12,11 @@
             this.Address = address;
         }
 
+        public uint GetAddress()
+        {
+            return this.Address;
+        }
+
         IAssemblyImage IMemoryObject.Image => this.Image;
 
         public virtual AssemblyImage Image { get; }
@@ -27,5 +32,7 @@
         protected string ReadString(uint offset) => this.Process.ReadAsciiStringPtr(this.Address + offset);
 
         protected uint ReadUInt32(uint offset) => this.Process.ReadUInt32(this.Address + offset);
+
+        protected byte ReadByte(uint offset) => this.Process.ReadByte(this.Address + offset);
     }
 }

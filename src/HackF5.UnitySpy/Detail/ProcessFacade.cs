@@ -33,6 +33,10 @@
         {
             return this.ReadBufferValue(address, sizeof(int), b => b.ToInt32());
         }
+        public long ReadInt64(uint address)
+        {
+            return this.ReadBufferValue(address, sizeof(long), b => b.ToInt64());
+        }
 
         public object ReadManaged([NotNull] TypeInfo type, uint address)
         {
@@ -70,10 +74,12 @@
                     return this.ReadUInt32(address);
 
                 case TypeCode.I8:
-                    return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToInt64);
+                    return this.ReadInt64(address);
+                    //return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToInt64);
 
                 case TypeCode.U8:
-                    return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToUInt64);
+                    return this.ReadUInt64(address);
+                    //return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToUInt64);
 
                 case TypeCode.R4:
                     return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToSingle);
@@ -88,7 +94,13 @@
                     return this.ReadManagedArray(type, address);
 
                 case TypeCode.VALUETYPE:
-                    return this.ReadManagedStructInstance(type, address);
+                    try
+                    {
+                        return this.ReadManagedStructInstance(type, address);
+                    } catch (Exception e)
+                    {
+                        return this.ReadInt32(address);
+                    }
 
                 case TypeCode.CLASS:
                     return this.ReadManagedClassInstance(type, address);
@@ -105,8 +117,11 @@
                 case TypeCode.OBJECT:
                     return this.ReadManagedGenericObject(type, address);
 
-                // may need supporting
                 case TypeCode.VAR:
+                    // Really not sure this is the way to do it
+                    return this.ReadInt32(address);
+
+                // may need supporting
                 case TypeCode.ARRAY:
                 case TypeCode.ENUM:
                 case TypeCode.MVAR:
@@ -151,6 +166,16 @@
         public uint ReadUInt32(uint address)
         {
             return this.ReadBufferValue(address, sizeof(uint), b => b.ToUInt32());
+        }
+
+        public ulong ReadUInt64(uint address)
+        {
+            return this.ReadBufferValue(address, sizeof(ulong), b => b.ToUInt64());
+        }
+
+        public byte ReadByte(uint address)
+        {
+            return this.ReadBufferValue(address, sizeof(byte), b => b.ToByte());
         }
 
         [DllImport("kernel32", SetLastError = true)]
@@ -239,6 +264,7 @@
         {
             var definition = type.Image.GetTypeDefinition(type.Data);
             var obj = new ManagedStructInstance(definition, address);
+            //var t = obj.GetValue<object>("enumSeperator");
             return obj.TypeDefinition.IsEnum ? obj.GetValue<object>("value__") : obj;
         }
 

@@ -1,5 +1,6 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
@@ -41,7 +42,10 @@
                     continue;
                 }
 
-                this.typeDefinitionsByFullName.Add(definition.FullName, definition);
+                if (!this.typeDefinitionsByFullName.ContainsKey(definition.FullName))
+                {
+                    this.typeDefinitionsByFullName.Add(definition.FullName, definition);
+                }
             }
         }
 
@@ -77,9 +81,9 @@
         {
             var definitions = new ConcurrentDictionary<uint, TypeDefinition>();
 
-            const uint classCache = 0x2a0u;
-            var classCacheSize = this.ReadUInt32(classCache + 0xc);
-            var classCacheTableArray = this.ReadPtr(classCache + 0x14);
+            const uint classCache = MonoLibraryOffsets.ImageClassCache;
+            var classCacheSize = this.ReadUInt32(classCache + MonoLibraryOffsets.HashTableSize);
+            var classCacheTableArray = this.ReadPtr(classCache + MonoLibraryOffsets.HashTableTable);
 
             for (var tableItem = 0u;
                 tableItem < (classCacheSize * Constants.SizeOfPtr);

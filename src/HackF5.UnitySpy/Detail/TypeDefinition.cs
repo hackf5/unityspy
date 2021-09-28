@@ -1,7 +1,6 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -9,6 +8,7 @@
     using System.Text;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
+    using System.Collections.Concurrent;
 
     /// <summary>
     /// Represents an unmanaged _MonoClass instance in a Mono process. This object describes the type of a class or
@@ -34,6 +34,8 @@
 
         private readonly Lazy<TypeDefinition> lazyParent;
 
+        private readonly Lazy<TypeDefinition> lazyGeneric;
+
         public TypeDefinition([NotNull] AssemblyImage image, uint address)
             : base(image, address)
         {
@@ -48,6 +50,7 @@
             this.lazyNestedIn = new Lazy<TypeDefinition>(() => this.GetClassDefinition(MonoLibraryOffsets.TypeDefinitionNestedIn));
             this.lazyFullName = new Lazy<string>(this.GetFullName);
             this.lazyFields = new Lazy<IReadOnlyList<FieldDefinition>>(this.GetFields);
+            this.lazyGeneric = new Lazy<TypeDefinition>(this.GetGeneric);
 
             this.Name = this.ReadString(MonoLibraryOffsets.TypeDefinitionName);
             this.NamespaceName = this.ReadString(MonoLibraryOffsets.TypeDefinitionNamespace);
@@ -55,15 +58,17 @@
             var vtablePtr = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
             this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVtables);
             this.TypeInfo = new TypeInfo(image, this.Address + MonoLibraryOffsets.TypeDefinitionByValArg);
+            this.VTableSize = vtablePtr == Constants.NullPtr ? Constants.NullPtr : this.ReadInt32(MonoLibraryOffsets.TypeDefinitionVTableSize);
+            this.ClassKind = (MonoClassKind)(this.ReadByte(MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
         }
 
         IReadOnlyList<IFieldDefinition> ITypeDefinition.Fields => this.Fields;
 
         public string FullName => this.lazyFullName.Value;
 
-        public bool IsEnum => (this.bitFields & 0x10) == 0x10;
+        public bool IsEnum => (this.bitFields & 0x8) == 0x8;
 
-        public bool IsValueType => (this.bitFields & 0x8) == 0x8;
+        public bool IsValueType => (this.bitFields & 0x4) == 0x4;
 
         public string Name { get; }
 
@@ -83,6 +88,10 @@
 
         public uint VTable { get; }
 
+        public int VTableSize { get; }
+
+        public MonoClassKind ClassKind { get; }
+
         public dynamic this[string fieldName] => this.GetStaticValue<dynamic>(fieldName);
 
         IFieldDefinition ITypeDefinition.GetField(string fieldName, string typeFullName) =>
@@ -91,9 +100,7 @@
         public TValue GetStaticValue<TValue>(string fieldName)
         {
             var field = this.GetField(fieldName, this.FullName)
-                ?? throw new ArgumentException(
-                    $"Field '{fieldName}' does not exist in class '{this.FullName}'.",
-                    nameof(fieldName));
+                ?? throw new ArgumentException($"Field '{fieldName}' does not exist in class '{this.FullName}'.", nameof(fieldName));
 
             if (!field.TypeInfo.IsStatic)
             {
@@ -105,7 +112,16 @@
                 throw new InvalidOperationException($"Field '{fieldName}' is constant in class '{this.FullName}'.");
             }
 
-            return field.GetValue<TValue>(this.Process.ReadPtr(this.VTable + 0xc));
+            try
+            {
+                return field.GetValue<TValue>(this.Process.ReadPtr(this.VTable + MonoLibraryOffsets.VTable + (uint)(4 * this.VTableSize)));
+            } 
+            catch (Exception e)
+            {
+                throw new Exception(
+                    $"Exception received when trying to get static value for field '{fieldName}' in class '{this.FullName}': ${e.Message}.", 
+                    e);
+            }
         }
 
         public FieldDefinition GetField(string fieldName, string typeFullName = default) =>
@@ -129,22 +145,29 @@
             var firstField = this.ReadPtr(MonoLibraryOffsets.TypeDefinitionFields);
             if (firstField == Constants.NullPtr)
             {
-                return this.Parent?.Fields ?? Array.Empty<FieldDefinition>();
+                return this.Parent?.Fields ?? new List<FieldDefinition>();
             }
 
             var fields = new List<FieldDefinition>();
-            for (var fieldIndex = 0u; fieldIndex < this.fieldCount; fieldIndex++)
+            if (this.ClassKind == MonoClassKind.GInst)
             {
-                var field = firstField + (fieldIndex * 0x10);
-                if (this.Process.ReadPtr(field) == Constants.NullPtr)
+                fields.AddRange(this.GetGeneric().GetFields());
+            }
+            else
+            {
+                for (var fieldIndex = 0u; fieldIndex < this.fieldCount; fieldIndex++)
                 {
-                    break;
-                }
+                    var field = firstField + (fieldIndex * MonoLibraryOffsets.TypeDefinitionFieldSize);
+                    if (this.Process.ReadPtr(field) == Constants.NullPtr)
+                    {
+                        break;
+                    }
 
-                fields.Add(new FieldDefinition(this, field));
+                    fields.Add(new FieldDefinition(this, field));
+                }
             }
 
-            fields.AddRange(this.Parent?.Fields ?? Array.Empty<FieldDefinition>());
+            fields.AddRange(this.Parent?.Fields ?? new List<FieldDefinition>());
 
             return new ReadOnlyCollection<FieldDefinition>(fields.OrderBy(f => f.Name).ToArray());
         }
@@ -178,6 +201,16 @@
 
                 nested = nested.NestedIn;
             }
+        }
+
+        private TypeDefinition GetGeneric()
+        {
+            if (this.ClassKind != MonoClassKind.GInst)
+            {
+                return null;
+            }
+
+            return this.Image.GetTypeDefinition(this.Image.Process.ReadPtr(this.ReadPtr(MonoLibraryOffsets.TypeDefinitionSizeOf)));
         }
     }
 }

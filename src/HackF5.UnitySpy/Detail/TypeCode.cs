@@ -50,6 +50,7 @@ namespace HackF5.UnitySpy.Detail
 
         [Description("string")]
         STRING = 0x0e,
+
         PTR = 0x0f,         /* arg: <type> token */
         BYREF = 0x10,       /* arg: <type> token */
         VALUETYPE = 0x11,   /* arg: <type> token */
@@ -64,6 +65,7 @@ namespace HackF5.UnitySpy.Detail
 
         [Description("uint")]
         U = 0x19,
+
         FNPTR = 0x1b,       /* arg: full method signature */
         OBJECT = 0x1c,
         SZARRAY = 0x1d,     /* 0-based one-dim-array */

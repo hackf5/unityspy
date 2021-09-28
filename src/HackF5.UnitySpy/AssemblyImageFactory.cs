@@ -65,6 +65,11 @@
                 if (assemblyName == name)
                 {
                     return new AssemblyImage(process, process.ReadPtr(assembly + MonoLibraryOffsets.AssemblyImage));
+                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x44)); -> CollectionManager is null if we have this
+                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x54)); -> CollectionManager is null if we have this
+                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x6c)); -> CollectionManager is null if we have this
+                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0xac)); -> CollectionManager is null if we have this
+                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0xac));
                 }
             }
 
@@ -104,7 +109,7 @@
                 modules.Add(module);
             }
 
-            return modules.FirstOrDefault(module => module.ModuleName == "mono.dll");
+            return modules.FirstOrDefault(module => module.ModuleName == "mono-2.0-bdwgc.dll");
         }
 
         private static int GetRootDomainFunctionAddress(byte[] moduleDump, ModuleInfo monoModuleInfo)
