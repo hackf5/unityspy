@@ -19,8 +19,8 @@
         {
             this.DeclaringType = declaringType;
             this.TypeInfo = new TypeInfo(declaringType.Image, this.ReadPtr(0x0));
-            this.Name = this.ReadString(0x4);
-            this.Offset = this.ReadInt32(0xc);
+            this.Name = this.ReadString(this.Process.SizeOfPtr);
+            this.Offset = this.ReadInt32(this.Process.SizeOfPtr * 3);
         }
 
         ITypeDefinition IFieldDefinition.DeclaringType => this.DeclaringType;
@@ -37,6 +37,7 @@
 
         public TValue GetValue<TValue>(IntPtr address)
         {
+            // TODO check this 8 value for 64 bits might be 16
             var offset = this.Offset - (this.DeclaringType.IsValueType ? 8 : 0);
             return (TValue)this.TypeInfo.GetValue(address + offset);
         }

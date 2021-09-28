@@ -34,6 +34,8 @@
 
         public int SizeOfPtr => is64Bits ? 8 : 4;
 
+        public bool Is64Bits => is64Bits;
+
         public string ReadAsciiString(IntPtr address, int maxSize = 1024)
         {
             return this.ReadBufferValue(address, maxSize, b => b.ToAsciiString());
@@ -227,12 +229,14 @@
             var arrayDefinition = type.Image.GetTypeDefinition(arrayDefinitionPtr);
             var elementDefinition = type.Image.GetTypeDefinition(this.ReadPtr(arrayDefinitionPtr));
 
-            var count = this.ReadInt32(ptr + 0xc);
-            var start = ptr + 0x10;
+            var elementSize = MonoLibraryOffsets.UsesArrayDefinitionSize ? arrayDefinition.Size : SizeOfPtr;
+
+            var count = this.ReadInt32(ptr + SizeOfPtr * 3);
+            var start = ptr + SizeOfPtr * 4;
             var result = new object[count];
             for (var i = 0; i < count; i++)
             {
-                result[i] = elementDefinition.TypeInfo.GetValue(start + i * arrayDefinition.Size);
+                result[i] = elementDefinition.TypeInfo.GetValue(start + i * elementSize);
             }
 
             return result;
@@ -265,10 +269,10 @@
                 return default;
             }
 
-            var length = this.ReadInt32(ptr + 0x8);
+            var length = this.ReadInt32(ptr + SizeOfPtr * 2);
 
             return this.ReadBufferValue(
-                ptr + 0xc,
+                ptr + MonoLibraryOffsets.UnicodeString,
                 2 * length,
                 b => Encoding.Unicode.GetString(b, 0, 2 * length));
         }

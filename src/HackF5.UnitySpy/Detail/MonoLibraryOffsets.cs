@@ -38,12 +38,53 @@ namespace HackF5.UnitySpy.Detail
             
             TypeDefinitionRuntimeInfoDomainVtables = 0x4,
 
-            VTable = 0x28
+            VTable = 0x28,
+
+            UnicodeString = 0xc,
+            UsesArrayDefinitionSize = true
         };
 
-        private static readonly List<MonoLibraryOffsets> supportedVersions = new List<MonoLibraryOffsets>()
+        public static readonly MonoLibraryOffsets Unity2019_4_5_x64_Offests = new MonoLibraryOffsets
         {
-            Unity2018_4_10_x86_Offests
+            UnityVersion = "2019.4.5",
+            Is64Bits = true,
+
+            AssemblyImage = 0x44 + 0x1c,
+            ReferencedAssemblies = 0x6c + 0x5c,
+            ImageClassCache = 0x354 + 0x16c,
+            HashTableSize = 0xc + 0xc,
+            HashTableTable = 0x14 + 0xc,
+
+            TypeDefinitionFieldSize = 0x10 + 0x10,
+            TypeDefinitionBitFields = 0x14 + 0xc,
+            TypeDefinitionClassKind = 0x1e + 0xc,
+            TypeDefinitionParent = 0x20 + 0x10,                         // 0x30
+            TypeDefinitionNestedIn = 0x24 + 0x14,                       // 0x38
+            TypeDefinitionName = 0x2c + 0x1c,                           // 0x48
+            TypeDefinitionNamespace = 0x30 + 0x20,                      // 0x50
+            TypeDefinitionVTableSize = 0x38 + 0x24,
+            TypeDefinitionSize = 0x5c + 0x20,
+            TypeDefinitionFields = 0x60 + 0x20 + 0x18,                  // 0x80
+            TypeDefinitionByValArg = 0x74 + 0x44,
+            TypeDefinitionRuntimeInfo = 0x84 + 0x34 + 0x18,             // 0xB8
+
+            TypeDefinitionFieldCount = 0xa4 + 0x34 + 0x10 + 0x18,
+            TypeDefinitionNextClassCache = 0xa8 + 0x34 + 0x10 + 0x18 + 0x4,
+
+            TypeDefinitionGenericContainer = 0x94 + 0x34 + 0x18 + 0x10,
+
+            TypeDefinitionRuntimeInfoDomainVtables = 0x4 + 0x4,
+
+            VTable = 0x28 + 0x18,
+
+            UnicodeString = 0x14,
+            UsesArrayDefinitionSize = false
+        };
+
+        private static readonly List<MonoLibraryOffsets> SupportedVersions = new List<MonoLibraryOffsets>()
+        {
+            Unity2018_4_10_x86_Offests,
+            Unity2019_4_5_x64_Offests
         };
 
         public string UnityVersion { get; private set; }
@@ -109,14 +150,25 @@ namespace HackF5.UnitySpy.Detail
 
         public int VTable { get; private set; }
 
+
+        // Managed String Offsets
+
+        public int UnicodeString { get; private set; }
+
+
+        // Managed Array Offsets
+
+        public bool UsesArrayDefinitionSize { get; private set; }
+
         public static MonoLibraryOffsets GetOffsets(string unityVersion, bool is64Bits)
         {
-            MonoLibraryOffsets monoLibraryOffsets = supportedVersions.Find(
+            MonoLibraryOffsets monoLibraryOffsets = SupportedVersions.Find(
                    offsets => offsets.Is64Bits == is64Bits
                 && unityVersion.StartsWith(offsets.UnityVersion)
             );
 
-            if(monoLibraryOffsets == null)
+            // TODO add code to find de best candidate instead of throwring exception.
+            if (monoLibraryOffsets == null)
             {
                 string mode = is64Bits ? "in 64 bits mode" : "in 32 Bits mode";
                 throw new NotSupportedException($"The unity version the process is running " +

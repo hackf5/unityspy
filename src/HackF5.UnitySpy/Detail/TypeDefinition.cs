@@ -114,7 +114,9 @@
 
             try
             {
-                return field.GetValue<TValue>(this.Process.ReadPtr(this.VTable + this.Process.MonoLibraryOffsets.VTable + 4 * this.VTableSize));
+                var vTableMemorySize = this.Process.SizeOfPtr * this.VTableSize;
+                var valuePtr = this.Process.ReadPtr(this.VTable + this.Process.MonoLibraryOffsets.VTable + vTableMemorySize);
+                return field.GetValue<TValue>(valuePtr);
             } 
             catch (Exception e)
             {
