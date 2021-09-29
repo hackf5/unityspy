@@ -37,8 +37,7 @@
 
         public TValue GetValue<TValue>(IntPtr address)
         {
-            // TODO check this 8 value for 64 bits might be 16
-            var offset = this.Offset - (this.DeclaringType.IsValueType ? 8 : 0);
+            var offset = this.Offset - (this.DeclaringType.IsValueType ? this.Process.SizeOfPtr * 2 : 0);
             return (TValue)this.TypeInfo.GetValue(address + offset);
         }
     }
