@@ -18,8 +18,15 @@
             : base((declaringType ?? throw new ArgumentNullException(nameof(declaringType))).Image, address)
         {
             this.DeclaringType = declaringType;
+
+            // MonoType        *type;
             this.TypeInfo = new TypeInfo(declaringType.Image, this.ReadPtr(0x0));
+
+            // MonoType        *name;
             this.Name = this.ReadString(this.Process.SizeOfPtr);
+
+            // wee need to skip MonoClass *parent field so we add
+            // 3 pointer sizes (*type, *name, *parent) to the base address
             this.Offset = this.ReadInt32(this.Process.SizeOfPtr * 3);
         }
 

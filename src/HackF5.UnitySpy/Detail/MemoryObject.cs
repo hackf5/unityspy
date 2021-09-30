@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace HackF5.UnitySpy.Detail
+﻿namespace HackF5.UnitySpy.Detail
 {
+    using System;
+
     /// <summary>
     /// The base type for all objects accessed in a process' memory. Every object has an address in memory
     /// and all information about that object is accessed via an offset from that address.
@@ -12,11 +12,6 @@ namespace HackF5.UnitySpy.Detail
         {
             this.Image = image;
             this.Address = address;
-        }
-
-        public IntPtr GetAddress()
-        {
-            return this.Address;
         }
 
         IAssemblyImage IMemoryObject.Image => this.Image;

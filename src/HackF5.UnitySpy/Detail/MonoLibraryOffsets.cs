@@ -167,7 +167,7 @@ namespace HackF5.UnitySpy.Detail
                 && unityVersion.StartsWith(offsets.UnityVersion)
             );
 
-            // TODO add code to find de best candidate instead of throwring exception.
+            // TODO add code to find the best candidate instead of throwing exception.
             if (monoLibraryOffsets == null)
             {
                 string mode = is64Bits ? "in 64 bits mode" : "in 32 Bits mode";

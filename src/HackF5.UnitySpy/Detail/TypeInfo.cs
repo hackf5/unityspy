@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace HackF5.UnitySpy.Detail
+﻿namespace HackF5.UnitySpy.Detail
 {
+    using System;
     using JetBrains.Annotations;
 
     /// <summary>

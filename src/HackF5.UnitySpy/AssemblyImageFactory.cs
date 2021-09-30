@@ -54,8 +54,19 @@
             if (process.Is64Bits)
             {
                 // Offsets taken by decompiling the 64 bits version of mono-2.0-bdwgc.dll
+                //
                 // mov rax, [rip + 0x46ad39]
                 // ret
+                //
+                // These two lines in Hex translate to
+                // 488B05 39AD46 00
+                // C3
+                // 
+                // So wee need to offset the first three bytes to get to the relative offset we need to add to rip
+                // rootDomainFunctionAddress + 3
+                //
+                // rip has the current value of the rootDoaminAddress plus the 7 bytes of the first instruction (mov rax, [rip + 0x46ad39])
+                // then we need to add this offsets to get the domain starting address
                 var offset = process.ReadInt32(rootDomainFunctionAddress + 3) + 7;
                 //// pointer to struct of type _MonoDomain
                 domain = process.ReadPtr(rootDomainFunctionAddress + offset);
@@ -79,11 +90,6 @@
                 if (assemblyName == name)
                 {
                     return new AssemblyImage(process, process.ReadPtr(assembly + process.MonoLibraryOffsets.AssemblyImage));
-                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x44)); -> CollectionManager is null if we have this
-                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x54)); -> CollectionManager is null if we have this
-                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0x6c)); -> CollectionManager is null if we have this
-                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0xac)); -> CollectionManager is null if we have this
-                    //return new AssemblyImage(process, process.ReadPtr(assembly + 0xac));
                 }
             }
 
@@ -91,8 +97,14 @@
         }
 
         // https://stackoverflow.com/questions/36431220/getting-a-list-of-dlls-currently-loaded-in-a-process-c-sharp
+        // TODO add check for matching platforms and implement the following code while keeping the existing one otherwise:
+        // This can be done with this if the process is running in 64 bits mode (and UnitySpy too of course)
+        // foreach(ProcessModule module in process.Process.Modules) {
+        //    if(module.ModuleName == "mono-2.0-bdwgc.dll") {
+        //        return new ModuleInfo(module.ModuleName, module.BaseAddress, module.ModuleMemorySize);
+        //    }            
         private static ModuleInfo GetMonoModule(ProcessFacade process)
-        {
+        {            
             var modulePointers = Native.GetProcessModulePointers(process);
 
             // Collect modules from the process
