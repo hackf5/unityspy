@@ -228,17 +228,13 @@
             var arrayDefinitionPtr = this.ReadPtr(vtable);
             var arrayDefinition = type.Image.GetTypeDefinition(arrayDefinitionPtr);
             var elementDefinition = type.Image.GetTypeDefinition(this.ReadPtr(arrayDefinitionPtr));
-
-            // Not sure why in the new version of unity the array it seems to have pointers instead of the element
-            // Maybe mono changed?
-            var elementSize = MonoLibraryOffsets.UsesArrayDefinitionSize ? arrayDefinition.Size : SizeOfPtr;
-
+            
             var count = this.ReadInt32(ptr + SizeOfPtr * 3);
             var start = ptr + (SizeOfPtr * 4);
             var result = new object[count];
             for (var i = 0; i < count; i++)
             {
-                result[i] = elementDefinition.TypeInfo.GetValue(start + (i * elementSize));
+                result[i] = elementDefinition.TypeInfo.GetValue(start + (i * arrayDefinition.Size));
             }
 
             return result;

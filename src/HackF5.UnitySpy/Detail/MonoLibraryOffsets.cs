@@ -40,8 +40,7 @@ namespace HackF5.UnitySpy.Detail
 
             VTable = 0x28,
 
-            UnicodeString = 0xc,
-            UsesArrayDefinitionSize = true
+            UnicodeString = 0xc
         };
 
         public static readonly MonoLibraryOffsets Unity2019_4_5_x64_Offests = new MonoLibraryOffsets
@@ -63,8 +62,8 @@ namespace HackF5.UnitySpy.Detail
             TypeDefinitionName = 0x2c + 0x1c,                           // 0x48
             TypeDefinitionNamespace = 0x30 + 0x20,                      // 0x50
             TypeDefinitionVTableSize = 0x38 + 0x24,
-            TypeDefinitionSize = 0x5c + 0x20,
-            TypeDefinitionFields = 0x60 + 0x20 + 0x18,                  // 0x80
+            TypeDefinitionSize = 0x5c + 0x20 + 0x18 - 0x4,              // 0x90 Array Element Count
+            TypeDefinitionFields = 0x60 + 0x20 + 0x18,                  // 0x98
             TypeDefinitionByValArg = 0x74 + 0x44,
             TypeDefinitionRuntimeInfo = 0x84 + 0x34 + 0x18,             // 0xB8
 
@@ -77,8 +76,7 @@ namespace HackF5.UnitySpy.Detail
 
             VTable = 0x28 + 0x18,
 
-            UnicodeString = 0x14,
-            UsesArrayDefinitionSize = false
+            UnicodeString = 0x14
         };
 
         private static readonly List<MonoLibraryOffsets> SupportedVersions = new List<MonoLibraryOffsets>()
@@ -154,11 +152,7 @@ namespace HackF5.UnitySpy.Detail
         // Managed String Offsets
 
         public int UnicodeString { get; private set; }
-
-
-        // Managed Array Offsets
-
-        public bool UsesArrayDefinitionSize { get; private set; }
+        
 
         public static MonoLibraryOffsets GetOffsets(string unityVersion, bool is64Bits)
         {
