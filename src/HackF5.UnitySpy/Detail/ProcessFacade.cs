@@ -14,27 +14,21 @@
     [PublicAPI]
     public class ProcessFacade
     {
-        private readonly bool is64Bits;
+        private readonly MonoLibraryOffsets monoLibraryOffsets;
 
         public ProcessFacade(int processId)
         {
             this.Process = Process.GetProcessById(processId);
-            is64Bits = Native.IsWow64Process(this.Process);
-
-            string mainModulePath = Native.GetMainModuleFileName(this.Process);
-
-            FileVersionInfo myFileVersionInfo = FileVersionInfo.GetVersionInfo(mainModulePath);
-            string unityVersion = myFileVersionInfo.FileVersion;
-            this.MonoLibraryOffsets = MonoLibraryOffsets.GetOffsets(unityVersion, is64Bits);
+            this.monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(Native.GetMainModuleFileName(this.Process));
         }
 
         public Process Process { get; }
 
-        public MonoLibraryOffsets MonoLibraryOffsets { get; }
+        public MonoLibraryOffsets MonoLibraryOffsets => this.monoLibraryOffsets;
 
-        public int SizeOfPtr => is64Bits ? 8 : 4;
+        public int SizeOfPtr => this.monoLibraryOffsets.Is64Bits ? 8 : 4;
 
-        public bool Is64Bits => is64Bits;
+        public bool Is64Bits => this.monoLibraryOffsets.Is64Bits;
 
         public string ReadAsciiString(IntPtr address, int maxSize = 1024)
         {
@@ -176,7 +170,7 @@
             return buffer;
         }
 
-        public IntPtr ReadPtr(IntPtr address) => (IntPtr) (this.is64Bits ? this.ReadUInt64(address) : this.ReadUInt32(address));
+        public IntPtr ReadPtr(IntPtr address) => (IntPtr)(this.Is64Bits ? this.ReadUInt64(address) : this.ReadUInt32(address));
 
         public uint ReadUInt32(IntPtr address)
         {

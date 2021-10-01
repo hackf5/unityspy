@@ -68,29 +68,7 @@
                 fileNameBuilder.ToString() :
                 null;
         }
-
-        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool IsWow64Process([In] IntPtr process, [Out] out bool wow64Process);
-
-        public static bool IsWow64Process(Process process)
-        {
-            if ((Environment.OSVersion.Version.Major > 5)
-                || ((Environment.OSVersion.Version.Major == 5) && (Environment.OSVersion.Version.Minor >= 1)))
-            {
-                if (!Environment.Is64BitOperatingSystem)
-                    return false;
-                // if this method is not available in your version of .NET, use GetNativeSystemInfo via P/Invoke instead
-
-                bool isWow64;
-                if (!IsWow64Process(process.Handle, out isWow64))
-                    throw new Exception("Something went wrong trying to figure out if the process is running a 64 bits or not");
-                return !isWow64;
-            }
-
-            return false; // not on 64-bit Windows Emulator
-        }
-
+        
         [StructLayout(LayoutKind.Sequential)]
         public struct ModuleInformation
         {
