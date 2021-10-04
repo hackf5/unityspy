@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Util
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Text;
     using HackF5.UnitySpy.Detail;
@@ -25,7 +26,7 @@
 
         public static IntPtr[] GetProcessModulePointers(ProcessFacade process)
         {
-            var modulePointers = new IntPtr[2048 * Constants.SizeOfPtr];
+            var modulePointers = new IntPtr[2048 * process.SizeOfPtr];
 
             // Determine number of modules
             if (!Native.EnumProcessModulesEx(
@@ -55,6 +56,19 @@
             [MarshalAs(UnmanagedType.U4)] out int lpCbNeeded,
             uint dwFilterFlag);
 
+        // https://stackoverflow.com/questions/5497064/how-to-get-the-full-path-of-running-process
+        [DllImport("Kernel32.dll")]
+        private static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
+
+        public static string GetMainModuleFileName(this Process process, int buffer = 1024)
+        {
+            var fileNameBuilder = new StringBuilder(buffer);
+            uint bufferLength = (uint)fileNameBuilder.Capacity + 1;
+            return QueryFullProcessImageName(process.Handle, 0, fileNameBuilder, ref bufferLength) ?
+                fileNameBuilder.ToString() :
+                null;
+        }
+        
         [StructLayout(LayoutKind.Sequential)]
         public struct ModuleInformation
         {

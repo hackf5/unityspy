@@ -1,9 +1,10 @@
 ﻿namespace HackF5.UnitySpy.Util
 {
+    using System;
+    
     public static class Constants
     {
-        public const int NullPtr = 0;
+        public static IntPtr NullPtr => IntPtr.Zero;
 
-        public const uint SizeOfPtr = sizeof(uint);
     }
 }

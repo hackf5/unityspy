@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy
 {
     using JetBrains.Annotations;
+    using System;
 
     /// <summary>
     /// Represents an object instance in managed memory.
