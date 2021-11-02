@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using HackF5.UnitySpy.ProcessFacade;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
@@ -20,7 +21,7 @@
 
         private readonly ConcurrentDictionary<IntPtr, TypeDefinition> typeDefinitionsByAddress;
 
-        public AssemblyImage(ProcessFacade process, IntPtr address)
+        public AssemblyImage(UnityProcessFacade process, IntPtr address)
             : base(null, address)
         {
             this.Process = process;
@@ -56,7 +57,7 @@
 
         public override AssemblyImage Image => this;
 
-        public override ProcessFacade Process { get; }
+        public override UnityProcessFacade Process { get; }
 
         public dynamic this[string fullTypeName] => this.GetTypeDefinition(fullTypeName);
 

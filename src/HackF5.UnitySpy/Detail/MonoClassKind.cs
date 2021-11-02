@@ -7,6 +7,6 @@
         GInst = 3,
         GParam = 4,
         Array = 5,
-        Pointer = 6,
+        Pointer = 6
     }
 }

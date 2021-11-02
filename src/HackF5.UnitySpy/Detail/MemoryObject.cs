@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using HackF5.UnitySpy.ProcessFacade;
 
     /// <summary>
     /// The base type for all objects accessed in a process' memory. Every object has an address in memory
@@ -18,7 +19,7 @@
 
         public virtual AssemblyImage Image { get; }
 
-        public virtual ProcessFacade Process => this.Image.Process;
+        public virtual UnityProcessFacade Process => this.Image.Process;
 
         protected IntPtr Address { get; }
 

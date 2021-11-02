@@ -1,51 +1,33 @@
-﻿namespace HackF5.UnitySpy.Detail
+﻿namespace HackF5.UnitySpy.ProcessFacade
 {
     using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Runtime.InteropServices;
     using System.Text;
+    using HackF5.UnitySpy.Detail;
     using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
+    using TypeCode = HackF5.UnitySpy.Detail.TypeCode;
 
     /// <summary>
     /// A facade over a process that provides access to its memory space.
     /// </summary>
     [PublicAPI]
-    public class ProcessFacade
+    public abstract class ProcessFacade
     {
-        private readonly MonoLibraryOffsets monoLibraryOffsets;
+        public bool Is64Bits { get; set; }
 
-        public ProcessFacade(int processId)
-        {
-            this.Process = Process.GetProcessById(processId);
-            this.monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(Native.GetMainModuleFileName(this.Process));
-        }
+        public int SizeOfPtr => this.Is64Bits ? 8 : 4;
 
-        public Process Process { get; }
-
-        public MonoLibraryOffsets MonoLibraryOffsets => this.monoLibraryOffsets;
-
-        public int SizeOfPtr => this.monoLibraryOffsets.Is64Bits ? 8 : 4;
-
-        public bool Is64Bits => this.monoLibraryOffsets.Is64Bits;
-
-        public string ReadAsciiString(IntPtr address, int maxSize = 1024)
-        {
-            return this.ReadBufferValue(address, maxSize, b => b.ToAsciiString());
-        }
+        public string ReadAsciiString(IntPtr address, int maxSize = 1024) =>
+            this.ReadBufferValue(address, maxSize, b => b.ToAsciiString());
 
         public string ReadAsciiStringPtr(IntPtr address, int maxSize = 1024) =>
             this.ReadAsciiString(this.ReadPtr(address), maxSize);
 
-        public int ReadInt32(IntPtr address)
-        {
-            return this.ReadBufferValue(address, sizeof(int), b => b.ToInt32());
-        }
-        public long ReadInt64(IntPtr address)
-        {
-            return this.ReadBufferValue(address, sizeof(long), b => b.ToInt64());
-        }
+        public int ReadInt32(IntPtr address) =>
+            this.ReadBufferValue(address, sizeof(int), b => b.ToInt32());
+
+        public long ReadInt64(IntPtr address) =>
+            this.ReadBufferValue(address, sizeof(long), b => b.ToInt64());
 
         public object ReadManaged([NotNull] TypeInfo type, IntPtr address)
         {
@@ -84,11 +66,11 @@
 
                 case TypeCode.I8:
                     return this.ReadInt64(address);
-                    //return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToInt64);
+                    // return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToInt64);
 
                 case TypeCode.U8:
                     return this.ReadUInt64(address);
-                    //return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToUInt64);
+                    // return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToUInt64);
 
                 case TypeCode.R4:
                     return this.ReadBufferValue(address, sizeof(char), ConversionUtils.ToSingle);
@@ -158,42 +140,37 @@
             }
         }
 
-        public byte[] ReadModule([NotNull] ModuleInfo monoModuleInfo)
+        public IntPtr ReadPtr(IntPtr address) =>
+            (IntPtr)(this.Is64Bits ? this.ReadUInt64(address) : this.ReadUInt32(address));
+
+        public uint ReadUInt32(IntPtr address) =>
+            this.ReadBufferValue(address, sizeof(uint), b => b.ToUInt32());
+
+        public ulong ReadUInt64(IntPtr address) =>
+            this.ReadBufferValue(address, sizeof(ulong), b => b.ToUInt64());
+
+        public byte ReadByte(IntPtr address) =>
+            this.ReadBufferValue(address, sizeof(byte), b => b.ToByte());
+
+        public byte[] ReadModule([NotNull] ModuleInfo moduleInfo)
         {
-            if (monoModuleInfo == null)
+            if (moduleInfo == null)
             {
-                throw new ArgumentNullException(nameof(monoModuleInfo));
+                throw new ArgumentNullException(nameof(moduleInfo));
             }
 
-            var buffer = new byte[monoModuleInfo.Size];
-            this.ReadProcessMemory(buffer, monoModuleInfo.BaseAddress);
+            var buffer = new byte[moduleInfo.Size];
+            this.ReadProcessMemory(buffer, moduleInfo.BaseAddress);
             return buffer;
         }
 
-        public IntPtr ReadPtr(IntPtr address) => (IntPtr)(this.Is64Bits ? this.ReadUInt64(address) : this.ReadUInt32(address));
+        public abstract void ReadProcessMemory(
+            byte[] buffer,
+            IntPtr processAddress,
+            bool allowPartialRead = false,
+            int? size = default);
 
-        public uint ReadUInt32(IntPtr address)
-        {
-            return this.ReadBufferValue(address, sizeof(uint), b => b.ToUInt32());
-        }
-
-        public ulong ReadUInt64(IntPtr address)
-        {
-            return this.ReadBufferValue(address, sizeof(ulong), b => b.ToUInt64());
-        }
-
-        public byte ReadByte(IntPtr address)
-        {
-            return this.ReadBufferValue(address, sizeof(byte), b => b.ToByte());
-        }
-
-        [DllImport("kernel32", SetLastError = true)]
-        private static extern bool ReadProcessMemory(
-            IntPtr hProcess,
-            IntPtr lpBaseAddress,
-            IntPtr lpBuffer,
-            int nSize,
-            out IntPtr lpNumberOfBytesRead);
+        public abstract ModuleInfo GetModule(string moduleName);
 
         private TValue ReadBufferValue<TValue>(IntPtr address, int size, Func<byte[], TValue> read)
         {
@@ -223,8 +200,8 @@
             var arrayDefinition = type.Image.GetTypeDefinition(arrayDefinitionPtr);
             var elementDefinition = type.Image.GetTypeDefinition(this.ReadPtr(arrayDefinitionPtr));
             
-            var count = this.ReadInt32(ptr + SizeOfPtr * 3);
-            var start = ptr + (SizeOfPtr * 4);
+            var count = this.ReadInt32(ptr + (this.SizeOfPtr * 3));
+            var start = ptr + (this.SizeOfPtr * 4);
             var result = new object[count];
             for (var i = 0; i < count; i++)
             {
@@ -261,10 +238,16 @@
                 return default;
             }
 
-            var length = this.ReadInt32(ptr + SizeOfPtr * 2);
+            // Offsets taken from:
+            // struct _MonoString {
+            //     MonoObject object; // Has two pointers (SizeOfPtr * 2)
+            //     int32_t length;
+            //     mono_unichar2 chars [MONO_ZERO_LEN_ARRAY];
+            // };
+            var length = this.ReadInt32(ptr + (this.SizeOfPtr * 2));
 
             return this.ReadBufferValue(
-                ptr + MonoLibraryOffsets.UnicodeString,
+                ptr + (this.SizeOfPtr * 2) + 4,
                 2 * length,
                 b => Encoding.Unicode.GetString(b, 0, 2 * length));
         }
@@ -273,48 +256,9 @@
         {
             var definition = type.Image.GetTypeDefinition(type.Data);
             var obj = new ManagedStructInstance(definition, address);
-            //var t = obj.GetValue<object>("enumSeperator");
+
+            // var t = obj.GetValue<object>("enumSeperator");
             return obj.TypeDefinition.IsEnum ? obj.GetValue<object>("value__") : obj;
-        }
-
-        private void ReadProcessMemory(
-            byte[] buffer,
-            uint processAddress,
-            bool allowPartialRead = false,
-            int? size = default)
-            => this.ReadProcessMemory(buffer, new IntPtr(processAddress), allowPartialRead, size);
-
-        private void ReadProcessMemory(
-            byte[] buffer,
-            IntPtr processAddress,
-            bool allowPartialRead = false,
-            int? size = default)
-        {
-            var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-
-            try
-            {
-                var bufferPointer = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-                if (!ProcessFacade.ReadProcessMemory(
-                    this.Process.Handle,
-                    processAddress,
-                    bufferPointer,
-                    size ?? buffer.Length,
-                    out _))
-                {
-                    var error = Marshal.GetLastWin32Error();
-                    if ((error == 299) && allowPartialRead)
-                    {
-                        return;
-                    }
-
-                    throw new Win32Exception(error);
-                }
-            }
-            finally
-            {
-                bufferHandle.Free();
-            }
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿// ReSharper disable IdentifierTypo
-namespace HackF5.UnitySpy.Detail
+namespace HackF5.UnitySpy.Offsets
 {
-
-    public class PEFormatOffsets
+    public static class PEFormatOffsets
     {
         // offsets taken from https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
         public const int Signature = 0x3c;

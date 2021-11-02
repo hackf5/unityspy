@@ -1,14 +1,14 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
-    using System.Collections.Concurrent;
+    using HackF5.UnitySpy.Util;
 
     /// <summary>
     /// Represents an unmanaged _MonoClass instance in a Mono process. This object describes the type of a class or
@@ -56,7 +56,7 @@
             this.NamespaceName = this.ReadString(image.Process.MonoLibraryOffsets.TypeDefinitionNamespace);
             this.Size = this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionSize);
             var vtablePtr = this.ReadPtr(image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
-            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVtables);
+            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVTables);
             this.TypeInfo = new TypeInfo(image, this.Address + image.Process.MonoLibraryOffsets.TypeDefinitionByValArg);
             this.VTableSize = vtablePtr == Constants.NullPtr ? 0 : this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionVTableSize);
             this.ClassKind = (MonoClassKind)(this.ReadByte(image.Process.MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
@@ -117,11 +117,11 @@
                 var vTableMemorySize = this.Process.SizeOfPtr * this.VTableSize;
                 var valuePtr = this.Process.ReadPtr(this.VTable + this.Process.MonoLibraryOffsets.VTable + vTableMemorySize);
                 return field.GetValue<TValue>(valuePtr);
-            } 
+            }
             catch (Exception e)
             {
                 throw new Exception(
-                    $"Exception received when trying to get static value for field '{fieldName}' in class '{this.FullName}': ${e.Message}.", 
+                    $"Exception received when trying to get static value for field '{fieldName}' in class '{this.FullName}': ${e.Message}.",
                     e);
             }
         }
