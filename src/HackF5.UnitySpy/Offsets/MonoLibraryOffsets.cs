@@ -194,8 +194,9 @@ namespace HackF5.UnitySpy.Offsets
             {
                 FileInfo gameExecutableFile = new FileInfo(gameExecutableFilePath);
                 string infoPlist = File.ReadAllText(gameExecutableFile.Directory.Parent.FullName + "/Info.plist");
-                string[] unityPlayerSplit = infoPlist.Split("Unity Player version ");
-                unityVersion = unityPlayerSplit[1].Split(" ")[0];
+                string unityVersionField = "Unity Player version ";
+                int indexOfUnityVersionField = infoPlist.IndexOf(unityVersionField);
+                unityVersion = infoPlist.Substring(indexOfUnityVersionField + unityVersionField.Length).Split(' ')[0];
 
                 // Start the child process.
                 Process p = new Process();

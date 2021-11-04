@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <CodeAnalysisRuleSet>..\rules.ruleset</CodeAnalysisRuleSet>
     <NoWarn>1701;1702;CA1724;CA1031</NoWarn>
     <LangVersion>latest</LangVersion>
