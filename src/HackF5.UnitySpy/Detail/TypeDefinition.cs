@@ -7,8 +7,8 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using JetBrains.Annotations;
     using HackF5.UnitySpy.Util;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Represents an unmanaged _MonoClass instance in a Mono process. This object describes the type of a class or

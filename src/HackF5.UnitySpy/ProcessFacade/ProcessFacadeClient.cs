@@ -1,8 +1,8 @@
 ﻿namespace HackF5.UnitySpy.ProcessFacade
 {
     using System;
-    using System.Net;  
-    using System.Net.Sockets;  
+    using System.Net;
+    using System.Net.Sockets;
     using System.Runtime.InteropServices;
     using JetBrains.Annotations;
 
@@ -68,15 +68,16 @@
         }
 
         // Connect to the server
-        private void Connect() {
+        private void Connect()
+        {
             Console.WriteLine("Connecting to server...");
 
-            // Establish the remote endpoint for the socket.  
+            // Establish the remote endpoint for the socket.
             IPHostEntry localhost = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = localhost.AddressList[0];  
+            IPAddress ipAddress = localhost.AddressList[0];
             IPEndPoint serverEndPoint = new IPEndPoint(ipAddress, Port);
 
-            // Create a TCP/IP  socket.  
+            // Create a TCP/IP  socket.
             this.socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             this.socket.Connect(serverEndPoint);
         }

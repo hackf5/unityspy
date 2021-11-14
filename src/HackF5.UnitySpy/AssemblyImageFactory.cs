@@ -19,6 +19,11 @@
     {
         public static IAssemblyImage Create([NotNull] UnityProcessFacade process, string assemblyName = "Assembly-CSharp")
         {
+            if (process == null)
+            {
+                throw new ArgumentNullException("process parameter cannot be null");
+            }
+
             var monoModule = process.GetMonoModule();
             IntPtr rootDomainFunctionAddress;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -90,7 +95,7 @@
                 var offset = process.ReadInt32(rootDomainFunctionAddress + ripPlusOffsetOffset) + ripValueOffset;
                 //// pointer to struct of type _MonoDomain
                 domain = process.ReadPtr(rootDomainFunctionAddress + offset);
-            } 
+            }
             else
             {
                 var domainAddress = process.ReadPtr(rootDomainFunctionAddress + 1);

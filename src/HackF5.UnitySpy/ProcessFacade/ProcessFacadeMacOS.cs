@@ -26,16 +26,21 @@
             bool allowPartialRead = false,
             int? size = default)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("the buffer parameter cannot be null");
+            }
+
             var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
             try
             {
                 var bufferPointer = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-                if (0 != ProcessFacadeMacOS.ReadProcessMemory(
+                if (ProcessFacadeMacOS.ReadProcessMemory(
                     this.process.Id,
                     processAddress,
                     bufferPointer,
-                    size ?? buffer.Length))
+                    size ?? buffer.Length) != 0)
                 {
                     var error = Marshal.GetLastWin32Error();
                     if ((error == 299) && allowPartialRead)
@@ -60,7 +65,7 @@
             }
 
             IntPtr baseAddress;
-            uint size = 0;            
+            uint size = 0;
             IntPtr buffer = Marshal.AllocCoTaskMem(2048 + 1);
             string path;
             try
@@ -73,6 +78,7 @@
             {
                 Marshal.FreeCoTaskMem(buffer);
             }
+
             return new ModuleInfo(moduleName, baseAddress, size, path);
         }
 

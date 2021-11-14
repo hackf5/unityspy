@@ -23,21 +23,21 @@
             fixed (byte* bytePtr = buffer)
             {
                 var ptr = (IntPtr)bytePtr;
-                var localIo = new iovec
+                var localIo = new Iovec
                 {
-                    iov_base = ptr.ToPointer(),
-                    iov_len = length
+                    IovBase = ptr.ToPointer(),
+                    IovLen = length,
                 };
-                var remoteIo = new iovec
+                var remoteIo = new Iovec
                 {
-                    iov_base = processAddress.ToPointer(),
-                    iov_len = length
+                    IovBase = processAddress.ToPointer(),
+                    IovLen = length,
                 };
 
-                var res = process_vm_readv(this.processId, &localIo, 1, &remoteIo, 1, 0);
-                if(res != -1)
+                var res = ProcessVmReadV(this.ProcessId, &localIo, 1, &remoteIo, 1, 0);
+                if (res != -1)
                 {
-                    //Array.Copy(*(byte[]*)ptr, 0, buffer, 0, length);
+                    // Array.Copy(*(byte[]*)ptr, 0, buffer, 0, length);
                     Marshal.Copy(ptr, buffer, 0, length);
                 }
                 else
@@ -47,21 +47,20 @@
             }
         }
 
-        [DllImport("libc")]
-        private static extern unsafe int process_vm_readv(
+        [DllImport("libc", EntryPoint = "process_vm_readv")]
+        private static extern unsafe int ProcessVmReadV(
             int pid,
-            iovec* local_iov,
+            Iovec* local_iov,
             ulong liovcnt,
-            iovec* remote_iov,
+            Iovec* remote_iov,
             ulong riovcnt,
             ulong flags);
 
         [StructLayout(LayoutKind.Sequential)]
-        unsafe struct iovec
+        private unsafe struct Iovec
         {
-            public void* iov_base;
-            public int iov_len;
+            public void* IovBase;
+            public int IovLen;
         }
-
     }
 }

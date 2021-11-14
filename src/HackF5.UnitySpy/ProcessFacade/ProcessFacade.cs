@@ -88,7 +88,8 @@
                     try
                     {
                         return this.ReadManagedStructInstance(type, address);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         return this.ReadInt32(address);
                     }
@@ -199,7 +200,7 @@
             var arrayDefinitionPtr = this.ReadPtr(vtable);
             var arrayDefinition = type.Image.GetTypeDefinition(arrayDefinitionPtr);
             var elementDefinition = type.Image.GetTypeDefinition(this.ReadPtr(arrayDefinitionPtr));
-            
+
             var count = this.ReadInt32(ptr + (this.SizeOfPtr * 3));
             var start = ptr + (this.SizeOfPtr * 4);
             var result = new object[count];

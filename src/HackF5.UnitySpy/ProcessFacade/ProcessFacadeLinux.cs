@@ -11,7 +11,7 @@
     [PublicAPI]
     public abstract class ProcessFacadeLinux : ProcessFacade
     {
-        protected readonly int processId;
+        private readonly int processId;
 
         private readonly List<MemoryMapping> mappings;
 
@@ -35,12 +35,14 @@
                 }
                 else
                 {
-                    name = "";
+                    name = string.Empty;
                 }
 
                 this.mappings.Add(new MemoryMapping(memoryRegion[0], memoryRegion[1], name, lineColumnValues[4] != "0"));
             }
         }
+
+        public int ProcessId => this.processId;
 
         public override void ReadProcessMemory(
             byte[] buffer,
@@ -48,6 +50,11 @@
             bool allowPartialRead = false,
             int? size = default)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("the buffer parameter cannot be null");
+            }
+
             int length = size ?? buffer.Length;
             if (this.mappings.Exists(mapping => mapping.Contains(processAddress)))
             {
@@ -78,7 +85,7 @@
             while (mappingIndex < this.mappings.Count && (!this.mappings[mappingIndex].IsStartingModule || this.mappings[mappingIndex].ModuleName == fullModuleName))
             {
                 mappingIndex++;
-            }  
+            }
 
             mappingIndex--;
             uint size = Convert.ToUInt32(MemoryMapping.GetSize(startingAddress, this.mappings[mappingIndex].EndAddress));
@@ -107,24 +114,14 @@
 
         protected struct MemoryMapping
         {
-            public IntPtr StartAddress { get; set; }
-
-            public IntPtr EndAddress { get; set; }
-
-            public string ModuleName { get; set; }
-
-            public bool IsStartingModule { get; set; }
-
             public MemoryMapping(string startAddress, string endAddress, string moduleName, bool isStartingModule)
-                : this(new IntPtr(Convert.ToInt64(startAddress, 16)),
-                       new IntPtr(Convert.ToInt64(endAddress, 16)),
-                       moduleName,
-                       isStartingModule
-                )
+                : this(
+                    new IntPtr(Convert.ToInt64(startAddress, 16)),
+                    new IntPtr(Convert.ToInt64(endAddress, 16)),
+                    moduleName,
+                    isStartingModule)
             {
             }
-
-            public long Size => MemoryMapping.GetSize(this.StartAddress, this.EndAddress);
 
             public MemoryMapping(IntPtr startAddress, IntPtr endAddress, string moduleName, bool isStartingModule)
             {
@@ -133,6 +130,16 @@
                 this.ModuleName = moduleName;
                 this.IsStartingModule = isStartingModule;
             }
+
+            public IntPtr StartAddress { get; set; }
+
+            public IntPtr EndAddress { get; set; }
+
+            public string ModuleName { get; set; }
+
+            public bool IsStartingModule { get; set; }
+
+            public long Size => MemoryMapping.GetSize(this.StartAddress, this.EndAddress);
 
             public static long GetSize(IntPtr startAddress, IntPtr endAddress)
                 => endAddress.ToInt64() - startAddress.ToInt64();

@@ -32,6 +32,14 @@
 
         public static double ToDouble(this byte[] buffer) => BitConverter.ToDouble(buffer, 0);
 
-        public static byte ToByte(this byte[] buffer) => buffer[0];
+        public static byte ToByte(this byte[] buffer)
+        {
+            if (buffer == null || buffer.Length == 0)
+            {
+                throw new ArgumentNullException("the buffer parameter cannot be null or empty");
+            }
+
+            return buffer[0];
+        }
     }
 }

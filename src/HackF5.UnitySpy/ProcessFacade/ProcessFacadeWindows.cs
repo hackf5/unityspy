@@ -20,7 +20,8 @@
 
         private readonly Process process;
 
-        public ProcessFacadeWindows(Process process) : base()
+        public ProcessFacadeWindows(Process process)
+            : base()
         {
             this.process = process;
         }
@@ -33,13 +34,18 @@
             bool allowPartialRead = false,
             int? size = default)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("the buffer parameter cannot be null");
+            }
+
             var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
             try
             {
                 var bufferPointer = Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0);
-                if (!ProcessFacadeWindows.ReadProcessMemory(  
-                    this.process.Handle,                  
+                if (!ProcessFacadeWindows.ReadProcessMemory(
+                    this.process.Handle,
                     processAddress,
                     bufferPointer,
                     size ?? buffer.Length,
@@ -59,7 +65,7 @@
                 bufferHandle.Free();
             }
         }
-        
+
         public string GetMainModuleFileName(int buffer = 1024)
         {
             var fileNameBuilder = new StringBuilder(buffer);
@@ -89,7 +95,7 @@
             {
                 var moduleFilePath = new StringBuilder(1024);
                 var errorCode = GetModuleFileNameEx(
-                    process.Handle,
+                    this.process.Handle,
                     modulePointer,
                     moduleFilePath,
                     (uint)moduleFilePath.Capacity);
@@ -112,28 +118,6 @@
             }
 
             return modules.FirstOrDefault(module => module.ModuleName == moduleName);
-        }
-
-        private IntPtr[] GetModulePointers()
-        {
-            var modulePointers = new IntPtr[2048 * this.SizeOfPtr];
-
-            // Determine number of modules
-            if (!EnumProcessModulesEx(
-                this.process.Handle,
-                modulePointers,
-                modulePointers.Length,
-                out var bytesNeeded,
-                0x03))
-            {
-                throw new COMException(
-                    "Failed to read modules from the external process.",
-                    Marshal.GetLastWin32Error());
-            }
-
-            var result = new IntPtr[bytesNeeded / IntPtr.Size];
-            Buffer.BlockCopy(modulePointers, 0, result, 0, bytesNeeded);
-            return result;
         }
 
         [DllImport(ProcessFacadeWindows.PsApiDll, SetLastError = true)]
@@ -171,6 +155,29 @@
         // https://stackoverflow.com/questions/5497064/how-to-get-the-full-path-of-running-process
         [DllImport("Kernel32.dll")]
         private static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] uint dwFlags, [Out] StringBuilder lpExeName, [In, Out] ref uint lpdwSize);
+
+        private IntPtr[] GetModulePointers()
+        {
+            var modulePointers = new IntPtr[2048 * this.SizeOfPtr];
+
+            // Determine number of modules
+            if (!EnumProcessModulesEx(
+                this.process.Handle,
+                modulePointers,
+                modulePointers.Length,
+                out var bytesNeeded,
+                0x03))
+            {
+                throw new COMException(
+                    "Failed to read modules from the external process.",
+                    Marshal.GetLastWin32Error());
+            }
+
+            var result = new IntPtr[bytesNeeded / IntPtr.Size];
+            Buffer.BlockCopy(modulePointers, 0, result, 0, bytesNeeded);
+            return result;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         private struct ModuleInformation
         {

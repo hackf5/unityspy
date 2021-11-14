@@ -4,8 +4,8 @@ namespace HackF5.UnitySpy.Offsets
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Runtime.InteropServices;
     using System.IO;
+    using System.Runtime.InteropServices;
 
     public class MonoLibraryOffsets
     {
@@ -20,7 +20,7 @@ namespace HackF5.UnitySpy.Offsets
             ImageClassCache = 0x354,
             HashTableSize = 0xc,
             HashTableTable = 0x14,
-            
+
             TypeDefinitionFieldSize = 0x10,
             TypeDefinitionBitFields = 0x14,
             TypeDefinitionClassKind = 0x1e,
@@ -38,15 +38,15 @@ namespace HackF5.UnitySpy.Offsets
             TypeDefinitionNextClassCache = 0xa8,
 
             TypeDefinitionGenericContainer = 0x94,
-            
+
             TypeDefinitionRuntimeInfoDomainVTables = 0x4,
 
-            VTable = 0x28
+            VTable = 0x28,
         };
 
         public static readonly MonoLibraryOffsets Unity2019_4_2020_3_x64_Offsets = new MonoLibraryOffsets
         {
-            UnityVersions = new List<UnityVersion> { UnityVersion.Version2019_4_5, UnityVersion.Version2020_3_13 }, 
+            UnityVersions = new List<UnityVersion> { UnityVersion.Version2019_4_5, UnityVersion.Version2020_3_13 },
             Is64Bits = true,
             MonoLibraryName = new MonoLibraryName("mono-2.0-bdwgc.dll", "libmonobdwgc-2.0.dylib"),
 
@@ -76,13 +76,13 @@ namespace HackF5.UnitySpy.Offsets
 
             TypeDefinitionRuntimeInfoDomainVTables = 0x4 + 0x4,
 
-            VTable = 0x28 + 0x18
+            VTable = 0x28 + 0x18,
         };
 
         private static readonly List<MonoLibraryOffsets> SupportedVersions = new List<MonoLibraryOffsets>()
         {
             Unity2018_4_10_x86_Offsets,
-            Unity2019_4_2020_3_x64_Offsets
+            Unity2019_4_2020_3_x64_Offsets,
         };
 
         public List<UnityVersion> UnityVersions { get; private set; }
@@ -101,9 +101,7 @@ namespace HackF5.UnitySpy.Offsets
 
         public int HashTableTable { get; private set; }
 
-
         // MonoClass Offsets
-
         public int TypeDefinitionFieldSize { get; private set; }
 
         public int TypeDefinitionBitFields { get; private set; }
@@ -128,30 +126,27 @@ namespace HackF5.UnitySpy.Offsets
 
         public int TypeDefinitionRuntimeInfo { get; private set; }
 
-
         // MonoClassDef Offsets
-
         public int TypeDefinitionFieldCount { get; private set; }
 
         public int TypeDefinitionNextClassCache { get; private set; }
 
-
         // MonoClassGtd Offsets
-
         public int TypeDefinitionGenericContainer { get; private set; }
 
-
         // MonoClassRuntimeInfo Offsets
-
         public int TypeDefinitionRuntimeInfoDomainVTables { get; private set; }
 
-
         // MonoVTable Offsets
-
         public int VTable { get; private set; }
 
         public static MonoLibraryOffsets GetOffsets(string gameExecutableFilePath, bool force = true)
         {
+            if (gameExecutableFilePath == null)
+            {
+                throw new ArgumentNullException("gameExecutableFilePath parameter cannot be null");
+            }
+
             string unityVersion;
             if (gameExecutableFilePath.EndsWith(".exe"))
             {
@@ -163,7 +158,6 @@ namespace HackF5.UnitySpy.Offsets
                 // Offset to PE header is always at 0x3C.
                 // The PE header starts with "PE\0\0" =  0x50 0x45 0x00 0x00,
                 // followed by a 2-byte machine type field (see the document above for the enum).
-                //
                 FileStream fs = new FileStream(gameExecutableFilePath, FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
                 fs.Seek(0x3c, SeekOrigin.Begin);
@@ -171,7 +165,8 @@ namespace HackF5.UnitySpy.Offsets
                 fs.Seek(peOffset, SeekOrigin.Begin);
                 uint peHead = br.ReadUInt32();
 
-                if (peHead != 0x00004550) // "PE\0\0", little-endian
+                // "PE\0\0", little-endian
+                if (peHead != 0x00004550)
                 {
                     throw new Exception("Can't find PE header");
                 }
@@ -200,6 +195,7 @@ namespace HackF5.UnitySpy.Offsets
 
                 // Start the child process.
                 Process p = new Process();
+
                 // Redirect the output stream of the child process.
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.RedirectStandardOutput = true;
@@ -215,6 +211,7 @@ namespace HackF5.UnitySpy.Offsets
                 p.WaitForExit();
                 return GetOffsets(unityVersion, output.EndsWith("x86_64\n"), force);
             }
+
             throw new NotSupportedException("Platform not supported");
         }
 
@@ -227,8 +224,7 @@ namespace HackF5.UnitySpy.Offsets
         {
             MonoLibraryOffsets monoLibraryOffsets = SupportedVersions.Find(
                    offsets => offsets.Is64Bits == is64Bits &&
-                              offsets.UnityVersions.Contains(unityVersion)
-            );
+                              offsets.UnityVersions.Contains(unityVersion));
             UnityVersion selectedUnityVersion = unityVersion;
 
             if (monoLibraryOffsets == null)
@@ -245,11 +241,11 @@ namespace HackF5.UnitySpy.Offsets
 
                     if (matchingArchitectureSupportedVersion.Count > 1)
                     {
-                        int bestCandidateYearDistance = 
+                        int bestCandidateYearDistance =
                             Math.Abs(unityVersion.Year - bestCandidateUnityVersion.Year);
-                        int bestCandidateVersionWithinYearDistance = 
+                        int bestCandidateVersionWithinYearDistance =
                             Math.Abs(unityVersion.VersionWithinYear - bestCandidateUnityVersion.VersionWithinYear);
-                        int bestCandidateSubversionWithinYearDistance = 
+                        int bestCandidateSubversionWithinYearDistance =
                             Math.Abs(unityVersion.SubversionWithinYear - bestCandidateUnityVersion.SubversionWithinYear);
                         for (int i = 1; i < matchingArchitectureSupportedVersion.Count; i++)
                         {
@@ -259,33 +255,34 @@ namespace HackF5.UnitySpy.Offsets
                                 || (
                                        Math.Abs(unityVersion.Year - candidateVersion.Year) == bestCandidateYearDistance
                                     && (
-                                            Math.Abs(unityVersion.VersionWithinYear - candidateVersion.VersionWithinYear) 
+                                            Math.Abs(unityVersion.VersionWithinYear - candidateVersion.VersionWithinYear)
                                                 < bestCandidateVersionWithinYearDistance
                                         || (
-                                                Math.Abs(unityVersion.VersionWithinYear - candidateVersion.VersionWithinYear) 
+                                                Math.Abs(unityVersion.VersionWithinYear - candidateVersion.VersionWithinYear)
                                                     == bestCandidateVersionWithinYearDistance
                                             && (
-                                                Math.Abs(unityVersion.SubversionWithinYear - candidateVersion.SubversionWithinYear) 
+                                                Math.Abs(unityVersion.SubversionWithinYear - candidateVersion.SubversionWithinYear)
                                                     < bestCandidateSubversionWithinYearDistance
                                                )
                                            )
                                        )
-                                   )
+                                    )
                                 )
                             {
                                 bestCandidate = matchingArchitectureSupportedVersion[i];
-                                bestCandidateYearDistance = 
+                                bestCandidateYearDistance =
                                     Math.Abs(unityVersion.Year - candidateVersion.Year);
-                                bestCandidateVersionWithinYearDistance = 
+                                bestCandidateVersionWithinYearDistance =
                                     Math.Abs(unityVersion.VersionWithinYear - candidateVersion.VersionWithinYear);
-                                bestCandidateSubversionWithinYearDistance = 
-                                    Math.Abs(unityVersion.SubversionWithinYear - candidateVersion.SubversionWithinYear);                        
+                                bestCandidateSubversionWithinYearDistance =
+                                    Math.Abs(unityVersion.SubversionWithinYear - candidateVersion.SubversionWithinYear);
                             }
                         }
                     }
+
                     Console.WriteLine(unsupportedMsg);
                     Console.WriteLine($"Offsets of {bestCandidateUnityVersion.ToString()} selected instead.");
-                    
+
                     return bestCandidate;
                 }
 
@@ -294,7 +291,7 @@ namespace HackF5.UnitySpy.Offsets
 
             return monoLibraryOffsets;
         }
-        
+
         private static UnityVersion GetBestCandidate(UnityVersion target, List<UnityVersion> unityVersions)
         {
             if (unityVersions == null || unityVersions.Count == 0)
@@ -303,13 +300,13 @@ namespace HackF5.UnitySpy.Offsets
             }
 
             UnityVersion bestCandidate = unityVersions[0];
-            if(unityVersions.Count > 1)
+            if (unityVersions.Count > 1)
             {
-                int bestCandidateYearDistance = 
+                int bestCandidateYearDistance =
                     Math.Abs(target.Year - bestCandidate.Year);
-                int bestCandidateVersionWithinYearDistance = 
+                int bestCandidateVersionWithinYearDistance =
                     Math.Abs(target.VersionWithinYear - bestCandidate.VersionWithinYear);
-                int bestCandidateSubversionWithinYearDistance = 
+                int bestCandidateSubversionWithinYearDistance =
                     Math.Abs(target.SubversionWithinYear - bestCandidate.SubversionWithinYear);
                 for (int i = 1; i < unityVersions.Count; i++)
                 {
@@ -319,27 +316,27 @@ namespace HackF5.UnitySpy.Offsets
                         || (
                                 Math.Abs(target.Year - candidateVersion.Year) == bestCandidateYearDistance
                             && (
-                                    Math.Abs(target.VersionWithinYear - candidateVersion.VersionWithinYear) 
+                                    Math.Abs(target.VersionWithinYear - candidateVersion.VersionWithinYear)
                                         < bestCandidateVersionWithinYearDistance
                                 || (
-                                        Math.Abs(target.VersionWithinYear - candidateVersion.VersionWithinYear) 
+                                        Math.Abs(target.VersionWithinYear - candidateVersion.VersionWithinYear)
                                             == bestCandidateVersionWithinYearDistance
                                     && (
-                                        Math.Abs(target.SubversionWithinYear - candidateVersion.SubversionWithinYear) 
+                                        Math.Abs(target.SubversionWithinYear - candidateVersion.SubversionWithinYear)
                                             < bestCandidateSubversionWithinYearDistance
                                         )
                                     )
                                 )
                             )
-                        ) 
+                        )
                     {
                         bestCandidate = unityVersions[i];
-                        bestCandidateYearDistance = 
+                        bestCandidateYearDistance =
                             Math.Abs(target.Year - candidateVersion.Year);
-                        bestCandidateVersionWithinYearDistance = 
+                        bestCandidateVersionWithinYearDistance =
                             Math.Abs(target.VersionWithinYear - candidateVersion.VersionWithinYear);
-                        bestCandidateSubversionWithinYearDistance = 
-                            Math.Abs(target.SubversionWithinYear - candidateVersion.SubversionWithinYear);                        
+                        bestCandidateSubversionWithinYearDistance =
+                            Math.Abs(target.SubversionWithinYear - candidateVersion.SubversionWithinYear);
                     }
                 }
             }

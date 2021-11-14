@@ -10,10 +10,10 @@ namespace HackF5.UnitySpy.Offsets
         {
             this.peFormatName = peFormatName;
             this.machOFormatName = machOFormatName;
-        }    
+        }
 
         public string PeFormatName => this.peFormatName;
-        
+
         public string MachOFormatName => this.machOFormatName;
     }
 }
