@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".shared", ".shared", "{DD35
 		rules.ruleset = rules.ruleset
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackF5.UnitySpy.Gui", "HackF5.UnitySpy.Gui\HackF5.UnitySpy.Gui.csproj", "{53214F8D-8702-490D-930D-6DA45DBEBD85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackF5.UnitySpy.Gui.Wpf", "HackF5.UnitySpy.Gui.Wpf\HackF5.UnitySpy.Gui.Wpf.csproj", "{53214F8D-8702-490D-930D-6DA45DBEBD85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
