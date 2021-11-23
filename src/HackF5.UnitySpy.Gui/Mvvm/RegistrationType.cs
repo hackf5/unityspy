@@ -1,4 +1,4 @@
-﻿namespace HackF5.UnitySpy.Gui.Wpf.Mvvm
+﻿namespace HackF5.UnitySpy.Gui.Mvvm
 {
     public enum RegistrationType
     {

@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using System.Collections.Generic;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -16,8 +17,8 @@
 
         private readonly IntPtr vtable;
 
-        public ManagedClassInstance([NotNull] AssemblyImage image, IntPtr address)
-            : base(image, address)
+        public ManagedClassInstance([NotNull] AssemblyImage image, List<TypeInfo> genericTypeArguments, IntPtr address)
+            : base(image, genericTypeArguments, address)
         {
             if (image == null)
             {

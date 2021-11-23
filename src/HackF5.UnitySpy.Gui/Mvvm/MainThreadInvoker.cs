@@ -1,13 +1,13 @@
-﻿namespace HackF5.UnitySpy.Gui.Wpf.Mvvm
+﻿namespace HackF5.UnitySpy.Gui.Mvvm
 {
     using System;
     using System.Threading.Tasks;
     using System.Windows;
     using JetBrains.Annotations;
 
-    public class MainThreadInvoker : IMainThreadInvoker
+    public abstract class MainThreadInvoker : IMainThreadInvoker
     {
-        public static IMainThreadInvoker Current { get; set; } = new MainThreadInvoker();
+        public static IMainThreadInvoker Current { get; set; }
 
         public void InvokeOnMainThread([InstantHandle] [NotNull] Action action)
         {
@@ -16,13 +16,13 @@
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (Application.Current.CheckAccess())
+            if (this.CheckAccess())
             {
                 action();
                 return;
             }
 
-            Application.Current.Dispatcher.Invoke(action);
+            this.Invoke(action);
         }
 
         public async Task InvokeOnMainThreadAsync(Action action)
@@ -32,13 +32,19 @@
                 throw new ArgumentNullException(nameof(action));
             }
 
-            if (Application.Current.CheckAccess())
+            if (this.CheckAccess())
             {
                 action();
                 return;
             }
 
-            await Application.Current.Dispatcher.InvokeAsync(action);
+            await this.InvokeAsync(action);
         }
+
+        protected abstract bool CheckAccess();
+
+        protected abstract void Invoke(Action action);
+
+        protected abstract Task InvokeAsync(Action action);
     }
 }

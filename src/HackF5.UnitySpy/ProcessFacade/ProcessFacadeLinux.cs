@@ -90,8 +90,6 @@
             mappingIndex--;
             uint size = Convert.ToUInt32(MemoryMapping.GetSize(startingAddress, this.mappings[mappingIndex].EndAddress));
 
-            Console.WriteLine($"Mono Module starting address = {startingAddress.ToString("X")}, end address = {this.mappings[mappingIndex].EndAddress.ToString("X")}");
-
             return new ModuleInfo(moduleName, startingAddress, size, fullModuleName);
         }
 

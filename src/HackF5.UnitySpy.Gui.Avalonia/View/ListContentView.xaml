@@ -1,0 +1,37 @@
+﻿<UserControl
+    x:Class="HackF5.UnitySpy.Gui.Avalonia.View.ListContentView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:HackF5.UnitySpy.Gui.ViewModel;assembly=HackF5.UnitySpy.Gui"
+    d:DataContext="{d:DesignInstance viewModel:ListContentViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    Name="ListContentView">
+    <Grid Background="Yellow">
+        <ListBox
+            Name="ItemsList"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            Items="{Binding Items}"
+            DoubleTapped="Control_OnMouseDoubleClick"
+            VirtualizationMode="Simple">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="viewModel:ListItemViewModel">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            Text="{Binding
+                                Index,
+                                StringFormat='{}[{0}]'}" />
+
+                        <TextBlock Text="{Binding Item}" />
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

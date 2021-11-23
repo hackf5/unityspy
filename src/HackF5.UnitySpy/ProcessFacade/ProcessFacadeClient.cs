@@ -4,6 +4,8 @@
     using System.Net;
     using System.Net.Sockets;
     using System.Runtime.InteropServices;
+    using System.Text;
+    using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -14,7 +16,9 @@
     {
         public const int Port = 39185;
         public const int BufferSize = 4096;
-        public const int RequestSize = 12;
+        public const int RequestSize = 13;
+        public const byte ReadMemoryRequestType = 0;
+        public const byte GetModuleRequestType = 1;
 
         private byte[] internalBuffer = new byte[BufferSize];
 
@@ -26,7 +30,7 @@
             int length)
         {
             int bufferIndex = 0;
-            Request request = new Request(processAddress, length);
+            Request request = new Request(ReadMemoryRequestType, processAddress, length);
 
             try
             {
@@ -65,6 +69,72 @@
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
                 this.CloseConnection();
             }
+        }
+
+        public ModuleInfo GetModuleInfo(string moduleName)
+        {
+            byte[] moduleNameInAscii = Encoding.ASCII.GetBytes(moduleName);
+            Request request = new Request(GetModuleRequestType, IntPtr.Zero, moduleNameInAscii.Length);
+            try
+            {
+                if (this.socket == null)
+                {
+                    this.Connect();
+                }
+
+                // Send the data through the socket.
+                int bytesSent = this.socket.Send(request.GetBytes());
+                bytesSent = this.socket.Send(moduleNameInAscii);
+
+                // Receive the base address
+                this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
+                IntPtr baseAddress = (IntPtr)this.internalBuffer.ToUInt64();
+
+                // Receive the size
+                this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
+                uint size = this.internalBuffer.ToUInt32();
+
+                string path = this.GetString();
+                return new ModuleInfo(moduleName, baseAddress, size, path);
+            }
+            catch (ArgumentNullException ane)
+            {
+                Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                this.CloseConnection();
+            }
+            catch (SocketException se)
+            {
+                Console.WriteLine("SocketException : {0}", se.ToString());
+                this.CloseConnection();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                this.CloseConnection();
+            }
+            
+            throw new Exception($"Could not find the {moduleName} module");
+        }
+
+        private string GetString()
+        {
+            // Receive the length of the string
+            int bytesRec = this.socket.Receive(this.internalBuffer, 4, SocketFlags.None);
+
+            int length = this.internalBuffer.ToInt32();
+
+            byte[] buffer = new byte[length];
+            int bufferIndex = 0;
+            do
+            {
+                bytesRec = this.socket.Receive(this.internalBuffer);
+
+                Array.Copy(this.internalBuffer, 0, buffer, bufferIndex, bytesRec);
+                bufferIndex += bytesRec;
+                length -= bytesRec;
+            }
+            while (length > 0);
+            return buffer.ToAsciiString();
         }
 
         // Connect to the server
@@ -111,11 +181,13 @@
         [StructLayout(LayoutKind.Sequential)]
         private struct Request
         {
+            private byte type;
             private IntPtr address;
             private int size;
 
-            public Request(IntPtr address, int size)
+            public Request(byte type, IntPtr address, int size)
             {
+                this.type = type;
                 this.address = address;
                 this.size = size;
             }

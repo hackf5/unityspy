@@ -1,10 +1,11 @@
-﻿namespace HackF5.UnitySpy.Gui.Wpf.Mvvm
+﻿namespace HackF5.UnitySpy.Gui.Avalonia.Mvvm
 {
     using System;
     using System.Collections.Concurrent;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Input;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using JetBrains.Annotations;
 
     [UsedImplicitly]

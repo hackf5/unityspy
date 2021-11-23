@@ -1,0 +1,92 @@
+﻿<FluentWindow 
+        x:Class="HackF5.UnitySpy.Gui.Avalonia.View.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel;assembly=HackF5.UnitySpy.Gui.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:view="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.View"
+        mc:Ignorable="d" d:DesignWidth="1350" d:DesignHeight="700" Height="600" Width="900"
+        Icon="{x:Null}"
+        x:Name="MainWindow"
+        WindowStartupLocation="CenterScreen"
+        Background="{x:Null}"
+        Title="MTGA Memory Reader">
+
+  <FluentWindow.Styles>
+    <Style Selector="TitleBar:fullscreen">
+      <Setter Property="Background" Value="#7f000000" />
+    </Style>
+  </FluentWindow.Styles>
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <DockPanel>
+
+    <Grid DockPanel.Dock="Top">
+      <Border Padding="15" />  
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="0" IsVisible="{Binding IsLinux, Mode=OneTime}">Mode</TextBlock>   
+      <ComboBox 
+        Grid.Row="0"
+        Grid.Column="1"
+        Margin="2"
+        HorizontalAlignment="Stretch"
+        IsVisible="{Binding IsLinux}" SelectedIndex="{Binding LinuxModeSelectedIndex, Mode=TwoWay}">
+          <ComboBoxItem>Direct (root access)</ComboBoxItem>
+          <ComboBoxItem>Client (user access) - server.c (root access)</ComboBoxItem>
+          <ComboBoxItem>PTrace (process_vm_readv)</ComboBoxItem>
+      </ComboBox>
+
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1">Process</TextBlock>
+      <ComboBox 
+        Grid.Row="1"
+        Grid.Column="1"
+        Classes="header" 
+        x:Name="processesComboBox" 
+        Items="{Binding Processes}" 
+        SelectedItem="{Binding SelectedProcess, Mode=TwoWay}"
+        HorizontalAlignment="Stretch"
+        Margin="2" >
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding NameAndId}"/>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+
+      <Button Margin="2" Grid.Column="2" Grid.Row="1" Command="{Binding RefreshProcesses}">Refresh</Button>
+
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" >Mem File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Text="{Binding MemPseudoFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Command="{Binding OpenMemPseudoFile}">Open</Button>
+
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" >Game Executable File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Command="{Binding OpenGameExecutableFile}">Open</Button>
+      
+      <Button    Margin="2" Grid.Column="0" Grid.Row="4" Command="{Binding BuildImageAssembly}">Read Assembly</Button>
+      <Button    Margin="2" Grid.Column="1" Grid.Row="4" Command="{Binding ReadRawMemory}" HorizontalAlignment="Left">Read Raw</Button>
+
+
+    </Grid>
+
+    <view:AssemblyImageView DataContext="{Binding Image}" />
+
+  </DockPanel>
+
+</FluentWindow>

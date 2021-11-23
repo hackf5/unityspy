@@ -2,6 +2,7 @@
 {
     using System.Windows;
     using Autofac;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using HackF5.UnitySpy.Gui.Wpf.Mvvm;
     using HackF5.UnitySpy.Gui.Wpf.ViewModel;
 
@@ -11,6 +12,8 @@
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            MainThreadInvoker.Current = new WpfMainThreadInvoker();
+
             base.OnStartup(e);
             var builder = new ContainerBuilder();
             builder.RegisterAssemblyModules(this.GetType().Assembly);
