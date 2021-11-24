@@ -44,7 +44,8 @@
 
                 var monoGenericContextPtr = monoGenericClassAddress + this.Process.SizeOfPtr;
                 var monoGenericInsPtr = this.Process.ReadPtr(monoGenericContextPtr);
-                //var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
+
+                // var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
                 var argumentCount = this.Process.ReadInt32(monoGenericContainerAddress + (4 * this.Process.SizeOfPtr));
                 var typeArgVPtr = monoGenericInsPtr + 0x8;
                 this.genericTypeArguments = new List<TypeInfo>(argumentCount);
@@ -79,15 +80,24 @@
 
         public TValue GetValue<TValue>(List<TypeInfo> genericTypeArguments, IntPtr address)
         {
-            var offset = this.Offset - (this.DeclaringType.IsValueType ? this.Process.SizeOfPtr * 2 : 0);
-            if (this.genericTypeArguments != null)
+            int offset;
+            if (this.DeclaringType.IsValueType && !this.TypeInfo.IsStatic)
             {
-                return (TValue)this.TypeInfo.GetValue(this.genericTypeArguments, address + offset);
+                offset = this.Offset - this.Process.SizeOfPtr * 2;
             }
             else
             {
-                return (TValue)this.TypeInfo.GetValue(genericTypeArguments, address + offset);
+                offset = this.Offset;
             }
+
+            // if (this.genericTypeArguments != null)
+            // {
+                return (TValue)this.TypeInfo.GetValue(this.genericTypeArguments, address + offset);
+            // }
+            // else
+            // {
+            //     return (TValue)this.TypeInfo.GetValue(address + offset);
+            // }
         }
     }
 }

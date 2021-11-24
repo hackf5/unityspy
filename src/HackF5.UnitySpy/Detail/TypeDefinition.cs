@@ -70,11 +70,12 @@
                 var monoClassAddress = this.Process.ReadPtr(monoGenericClassAddress);
                 TypeDefinition monoClass = this.Image.GetTypeDefinition(monoClassAddress);
 
-                var monoGeneriContainerPtr = monoClassAddress + this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer;
-                var monoGenericContainerAddress = this.Process.ReadPtr(monoGeneriContainerPtr);
+                var monoGenericContainerPtr = monoClassAddress + this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer;
+                var monoGenericContainerAddress = this.Process.ReadPtr(monoGenericContainerPtr);
 
                 var monoGenericContextPtr = monoGenericClassAddress + this.Process.SizeOfPtr;
                 var monoGenericInsPtr = this.Process.ReadPtr(monoGenericContextPtr);
+
                 //var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
                 var argumentCount = this.Process.ReadInt32(monoGenericContainerAddress + (4 * this.Process.SizeOfPtr));
                 var typeArgVPtr = monoGenericInsPtr + 0x8;

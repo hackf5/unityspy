@@ -16,13 +16,20 @@
     {
         public const int Port = 39185;
         public const int BufferSize = 4096;
-        public const int RequestSize = 13;
+        public const int RequestSize = 17;
         public const byte ReadMemoryRequestType = 0;
         public const byte GetModuleRequestType = 1;
+
+        private int processId;
 
         private byte[] internalBuffer = new byte[BufferSize];
 
         private Socket socket;
+
+        public ProcessFacadeClient(int processId)
+        {
+            this.processId = processId;
+        }
 
         public void ReadProcessMemory(
             byte[] buffer,
@@ -30,7 +37,7 @@
             int length)
         {
             int bufferIndex = 0;
-            Request request = new Request(ReadMemoryRequestType, processAddress, length);
+            Request request = new Request(ReadMemoryRequestType, this.processId, processAddress, length);
 
             try
             {
@@ -74,7 +81,7 @@
         public ModuleInfo GetModuleInfo(string moduleName)
         {
             byte[] moduleNameInAscii = Encoding.ASCII.GetBytes(moduleName);
-            Request request = new Request(GetModuleRequestType, IntPtr.Zero, moduleNameInAscii.Length);
+            Request request = new Request(GetModuleRequestType, this.processId, IntPtr.Zero, moduleNameInAscii.Length);
             try
             {
                 if (this.socket == null)
@@ -182,12 +189,14 @@
         private struct Request
         {
             private byte type;
+            private int pid;
             private IntPtr address;
             private int size;
 
-            public Request(byte type, IntPtr address, int size)
+            public Request(byte type, int pid, IntPtr address, int size)
             {
                 this.type = type;
+                this.pid = pid;
                 this.address = address;
                 this.size = size;
             }
@@ -195,10 +204,13 @@
             public byte[] GetBytes()
             {
                 byte[] arr = new byte[RequestSize];
+                arr[0] = type;
 
                 IntPtr ptr = Marshal.AllocHGlobal(RequestSize);
                 Marshal.StructureToPtr(this, ptr, true);
-                Marshal.Copy(ptr, arr, 0, RequestSize);
+
+                // start at 4 because the byte type in C# is just an int
+                Marshal.Copy(ptr + 4, arr, 1, RequestSize - 1);
                 Marshal.FreeHGlobal(ptr);
                 return arr;
             }

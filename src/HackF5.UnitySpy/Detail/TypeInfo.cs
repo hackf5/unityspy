@@ -45,6 +45,7 @@
             }
         }
 
-        public object GetValue(List<TypeInfo> genericTypeArguments, IntPtr address) => this.Process.ReadManaged(this, genericTypeArguments, address);
+        public object GetValue(List<TypeInfo> genericTypeArguments, IntPtr address)
+            => this.Process.ReadManaged(this, genericTypeArguments, address);
     }
 }

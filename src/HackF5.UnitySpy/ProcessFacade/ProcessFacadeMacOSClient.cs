@@ -16,7 +16,7 @@
         public ProcessFacadeMacOSClient(Process process)
             : base(process)
         {
-            this.client = new ProcessFacadeClient();
+            this.client = new ProcessFacadeClient(process.Id);
         }
 
         public override void ReadProcessMemory(

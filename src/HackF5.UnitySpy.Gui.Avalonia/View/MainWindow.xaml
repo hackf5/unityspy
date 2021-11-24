@@ -11,7 +11,7 @@
         x:Name="MainWindow"
         WindowStartupLocation="CenterScreen"
         Background="{x:Null}"
-        Title="MTGA Memory Reader">
+        Title="Unity Spy">
 
   <FluentWindow.Styles>
     <Style Selector="TitleBar:fullscreen">

@@ -152,7 +152,7 @@
             Process[] processes = await Task.Run(Process.GetProcesses);
 
             this.processesCollection.Clear();
-            IEnumerable<Process> orderedProcesses = processes;//.OrderBy(p => p.ProcessName);
+            IEnumerable<Process> orderedProcesses = processes.OrderBy(p => p.ProcessName);
             foreach(Process process in orderedProcesses) 
             {
                 this.processesCollection.Add(new ProcessViewModel(process));
@@ -194,17 +194,11 @@
 
         public async Task ShowRawMemoryView()
         {            
-            Console.WriteLine("DEBUG: Showing MemoryView");
-            //Dispatcher.UIThread.InvokeAsync(() => await MessageBox.Show(mainWindow, "Hello"));
-
-            //await Dispatcher.UIThread.InvokeAsync(() => MessageBox.ShowAsync(mainWindow, "Hello"));
-            await MessageBox.ShowAsync(mainWindow, "Hello");
-
             if (this.processFacade == null)
             {
                 this.CreateProcessFacade();
             }
-            Console.WriteLine("DEBUG: Showing MemoryView la puta");
+
             await this.rawMemoryView.ShowDialog(this.mainWindow);
         }
         
@@ -330,6 +324,7 @@
                     throw new NotSupportedException("Platform not supported");
                 }
             }
+
             Dispatcher.UIThread.InvokeAsync(() => 
                 ((RawMemoryViewModel)this.rawMemoryView.DataContext).Process = this.processFacade);
         }
