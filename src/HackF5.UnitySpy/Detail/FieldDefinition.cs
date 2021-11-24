@@ -90,14 +90,14 @@
                 offset = this.Offset;
             }
 
-            // if (this.genericTypeArguments != null)
-            // {
+            if (this.genericTypeArguments != null)
+            {
                 return (TValue)this.TypeInfo.GetValue(this.genericTypeArguments, address + offset);
-            // }
-            // else
-            // {
-            //     return (TValue)this.TypeInfo.GetValue(address + offset);
-            // }
+            }
+            else
+            {
+                return (TValue)this.TypeInfo.GetValue(genericTypeArguments, address + offset);
+            }
         }
     }
 }
