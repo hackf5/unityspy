@@ -48,14 +48,14 @@
             foreach (var assemblyType in assemblyTypes)
             {
                 // ReSharper disable once AssignNullToNotNullAttribute
-                ViewLocator.ViewTypes[assemblyType.FullName] = assemblyType;
+                ViewLocator.ViewTypes[assemblyType.Name] = assemblyType;
             }
         }
 
         private static Func<FrameworkElement> GetViewFactory([NotNull] Type viewModelType)
         {
             // ReSharper disable once PossibleNullReferenceException
-            var key = viewModelType.FullName.Replace("ViewModel", "View");
+            var key = viewModelType.Name.Replace("ViewModel", "View");
 
             if (!ViewLocator.ViewTypes.TryGetValue(key, out var viewType))
             {

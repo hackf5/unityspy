@@ -5,6 +5,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using HackF5.UnitySpy.Gui.Mvvm;
+    using HackF5.UnitySpy.Gui.ViewModel;
     using HackF5.UnitySpy.Gui.Wpf.Mvvm;
     using JetBrains.Annotations;
 

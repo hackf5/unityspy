@@ -2,8 +2,8 @@
 {
     using System.Reflection;
     using Autofac;
-    using HackF5.UnitySpy.Gui.Mvvm;
     using HackF5.UnitySpy.Gui.Avalonia.Mvvm;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using Module = Autofac.Module;
 
     public class GuiAutofacModule : Module

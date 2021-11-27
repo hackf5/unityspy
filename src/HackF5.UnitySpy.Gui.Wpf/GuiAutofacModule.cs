@@ -2,6 +2,7 @@
 {
     using System.Reflection;
     using Autofac;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using HackF5.UnitySpy.Gui.Wpf.Mvvm;
     using Module = Autofac.Module;
 

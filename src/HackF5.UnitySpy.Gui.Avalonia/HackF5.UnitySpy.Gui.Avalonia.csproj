@@ -21,11 +21,11 @@
   </ItemGroup>  
   
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.2" />
-    <PackageReference Include="Avalonia" Version="0.10.8" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.8" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.8" />
-    <PackageReference Include="Avalonia.Xaml.Interactions" Version="0.10.8" />
+    <PackageReference Include="Autofac" Version="6.3.0" />
+    <PackageReference Include="Avalonia" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
+    <PackageReference Include="Avalonia.Xaml.Interactions" Version="0.10.10.4" />
   </ItemGroup>
 
   <ItemGroup>

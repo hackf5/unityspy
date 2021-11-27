@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using System.Windows;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using JetBrains.Annotations;
 
     [PublicAPI]

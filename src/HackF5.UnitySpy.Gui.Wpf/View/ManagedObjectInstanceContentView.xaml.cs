@@ -1,7 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Gui.Wpf.View
 {
     using System.Windows.Input;
-    using HackF5.UnitySpy.Gui.Wpf.ViewModel;
+    using HackF5.UnitySpy.Gui.ViewModel;
 
     public partial class ManagedObjectInstanceContentView
     {
