@@ -36,91 +36,105 @@
             IntPtr processAddress,
             int length)
         {
-            int bufferIndex = 0;
-            Request request = new Request(ReadMemoryRequestType, this.processId, processAddress, length);
-
-            try
+            lock (this)
             {
-                if (this.socket == null)
+                int bufferIndex = 0;
+                Request request = new Request(ReadMemoryRequestType, this.processId, processAddress, length);
+                
+                // For debbuging
+                // Console.WriteLine($"Requested address = {processAddress.ToString("X")}, length = {length}");  
+                    
+                int bytesRec = 0;
+                try
                 {
-                    this.Connect();
+                    if (this.socket == null)
+                    {
+                        this.Connect();
+                    }
+
+                    // Send the data through the socket.
+                    int bytesSent = this.socket.Send(request.GetBytes());
+
+                    // Receive the response from the remote device.
+                    do
+                    {
+                        bytesRec = this.socket.Receive(this.internalBuffer);
+                        Array.Copy(this.internalBuffer, 0, buffer, bufferIndex, bytesRec);
+                        bufferIndex += bytesRec;
+                        length -= bytesRec;
+                    }
+                    while (length > 0);
                 }
-
-                // Send the data through the socket.
-                int bytesSent = this.socket.Send(request.GetBytes());
-
-                // Receive the response from the remote device.
-                int bytesRec;
-                do
+                catch (ArgumentNullException ane)
                 {
-                    bytesRec = this.socket.Receive(this.internalBuffer);
-
-                    Array.Copy(this.internalBuffer, 0, buffer, bufferIndex, bytesRec);
-                    bufferIndex += bytesRec;
-                    length -= bytesRec;
+                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    this.CloseConnection();
                 }
-                while (length > 0);
-            }
-            catch (ArgumentNullException ane)
-            {
-                Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
-                this.CloseConnection();
-            }
-            catch (SocketException se)
-            {
-                Console.WriteLine("SocketException : {0}", se.ToString());
-                this.CloseConnection();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Unexpected exception : {0}", e.ToString());
-                this.CloseConnection();
+                catch (ArgumentException ae)
+                {
+                    Console.WriteLine($"address = {processAddress.ToString("X")}, length = {length}, Bytes Rec = {bytesRec}, bufferIndex = {bufferIndex}, buffer length = {buffer.Length}");  
+                    Console.WriteLine("ArgumentException : {0}", ae.ToString());                
+                    this.CloseConnection();
+                }
+                catch (SocketException se)
+                {
+                    Console.WriteLine("SocketException : {0}", se.ToString());
+                    this.CloseConnection();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    this.CloseConnection();
+                }
             }
         }
 
         public ModuleInfo GetModuleInfo(string moduleName)
         {
-            byte[] moduleNameInAscii = Encoding.ASCII.GetBytes(moduleName);
-            Request request = new Request(GetModuleRequestType, this.processId, IntPtr.Zero, moduleNameInAscii.Length);
-            try
+            lock (this)
             {
-                if (this.socket == null)
+                byte[] moduleNameInAscii = Encoding.ASCII.GetBytes(moduleName);
+                Request request = new Request(GetModuleRequestType, this.processId, IntPtr.Zero, moduleNameInAscii.Length);
+                try
                 {
-                    this.Connect();
+                    if (this.socket == null)
+                    {
+                        this.Connect();
+                    }
+
+                    // Send the data through the socket.
+                    int bytesSent = this.socket.Send(request.GetBytes());
+                    bytesSent = this.socket.Send(moduleNameInAscii);
+
+                    // Receive the base address
+                    this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
+                    IntPtr baseAddress = (IntPtr)this.internalBuffer.ToUInt64();
+
+                    // Receive the size
+                    this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
+                    uint size = this.internalBuffer.ToUInt32();
+
+                    string path = this.GetString();
+                    return new ModuleInfo(moduleName, baseAddress, size, path);
                 }
-
-                // Send the data through the socket.
-                int bytesSent = this.socket.Send(request.GetBytes());
-                bytesSent = this.socket.Send(moduleNameInAscii);
-
-                // Receive the base address
-                this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
-                IntPtr baseAddress = (IntPtr)this.internalBuffer.ToUInt64();
-
-                // Receive the size
-                this.socket.Receive(this.internalBuffer, 8, SocketFlags.None);
-                uint size = this.internalBuffer.ToUInt32();
-
-                string path = this.GetString();
-                return new ModuleInfo(moduleName, baseAddress, size, path);
+                catch (ArgumentNullException ane)
+                {
+                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                    this.CloseConnection();
+                }
+                catch (SocketException se)
+                {
+                    Console.WriteLine("SocketException : {0}", se.ToString());
+                    this.CloseConnection();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                    this.CloseConnection();
+                }
+                
+                throw new Exception($"Could not find the {moduleName} module");
             }
-            catch (ArgumentNullException ane)
-            {
-                Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
-                this.CloseConnection();
-            }
-            catch (SocketException se)
-            {
-                Console.WriteLine("SocketException : {0}", se.ToString());
-                this.CloseConnection();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Unexpected exception : {0}", e.ToString());
-                this.CloseConnection();
-            }
-            
-            throw new Exception($"Could not find the {moduleName} module");
         }
 
         private string GetString()
