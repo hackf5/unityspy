@@ -32,9 +32,6 @@
                     throw new Exception("Error reading data from " + this.memFilePath);
                 }
             }
-            if(processAddress == (IntPtr)0x606A0000) {
-                System.IO.File.WriteAllBytes(processAddress.ToString("X")+".bin", buffer);
-            }
         }
     }
 }
