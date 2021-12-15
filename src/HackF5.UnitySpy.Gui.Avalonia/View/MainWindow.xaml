@@ -50,15 +50,17 @@
           <ComboBoxItem>Direct (root access)</ComboBoxItem>
           <ComboBoxItem>Client (user access) - server.c (root access)</ComboBoxItem>
           <ComboBoxItem>PTrace (process_vm_readv)</ComboBoxItem>
+          <ComboBoxItem>Dump Files</ComboBoxItem>
       </ComboBox>
 
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1">Process</TextBlock>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}">Process</TextBlock>
       <ComboBox 
         Grid.Row="1"
         Grid.Column="1"
         Classes="header" 
-        x:Name="processesComboBox" 
-        Items="{Binding Processes}" 
+        x:Name="processesComboBox"
+        IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}"
+        Items="{Binding Processes}"         
         SelectedItem="{Binding SelectedProcess, Mode=TwoWay}"
         HorizontalAlignment="Stretch"
         Margin="2" >
@@ -69,12 +71,20 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
 
-      <Button Margin="2" Grid.Column="2" Grid.Row="1" Command="{Binding RefreshProcesses}">Refresh</Button>
+      <Button Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}" Command="{Binding RefreshProcesses}">Refresh</Button>
+
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" >Maps File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Text="{Binding MapsFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Command="{Binding OpenMapsFile}">Open</Button>
+
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" >Dump Files Path</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Text="{Binding DumpFilesPath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Command="{Binding OpenDumpFilesDirectory}">Open</Button>
 
       <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" >Mem File</TextBlock>
       <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Text="{Binding MemPseudoFilePath, Mode=TwoWay}" />
       <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Command="{Binding OpenMemPseudoFile}">Open</Button>
-
+      
       <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" >Game Executable File</TextBlock>
       <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
       <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Command="{Binding OpenGameExecutableFile}">Open</Button>

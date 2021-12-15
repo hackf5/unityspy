@@ -10,10 +10,15 @@
     [PublicAPI]
     public class ProcessFacadeLinuxPTrace : ProcessFacadeLinux
     {
+        private readonly int processId;
+
         public ProcessFacadeLinuxPTrace(int processId)
             : base(processId)
         {
+            this.processId = processId;
         }
+
+        public int ProcessId => this.processId;
 
         protected unsafe override void ReadProcessMemory(
             byte[] buffer,

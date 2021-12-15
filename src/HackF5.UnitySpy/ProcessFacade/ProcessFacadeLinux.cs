@@ -11,15 +11,16 @@
     [PublicAPI]
     public abstract class ProcessFacadeLinux : ProcessFacade
     {
-        private readonly int processId;
-
         private readonly List<MemoryMapping> mappings;
 
         public ProcessFacadeLinux(int processId)
+            : this($"/proc/{processId}/maps")
         {
-            this.processId = processId;
+        }
 
-            string[] mappingsInFile = File.ReadAllLines($"/proc/{processId}/maps");
+        public ProcessFacadeLinux(string mapsFilePath)
+        {
+            string[] mappingsInFile = File.ReadAllLines(mapsFilePath);
             this.mappings = new List<MemoryMapping>(mappingsInFile.Length);
             string[] lineColumnValues;
             string[] memoryRegion;
@@ -41,8 +42,6 @@
                 this.mappings.Add(new MemoryMapping(memoryRegion[0], memoryRegion[1], name, lineColumnValues[4] != "0"));
             }
         }
-
-        public int ProcessId => this.processId;
 
         public override void ReadProcessMemory(
             byte[] buffer,
@@ -76,7 +75,7 @@
 
             if (mappingIndex < 0)
             {
-                throw new Exception("Mono module not found");
+                throw new Exception($"{moduleName} module not found");
             }
 
             IntPtr startingAddress = this.mappings[mappingIndex].StartAddress;
@@ -99,7 +98,7 @@
 
             if (mappingIndex < 0)
             {
-                throw new Exception("Mono module not found");
+                throw new Exception($"{moduleName} module not found");
             }
 
             return this.mappings[mappingIndex].ModuleName;

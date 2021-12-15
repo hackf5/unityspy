@@ -83,7 +83,7 @@
             int offset;
             if (this.DeclaringType.IsValueType && !this.TypeInfo.IsStatic)
             {
-                offset = this.Offset - this.Process.SizeOfPtr * 2;
+                offset = this.Offset - (this.Process.SizeOfPtr * 2);
             }
             else
             {

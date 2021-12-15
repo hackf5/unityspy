@@ -36,14 +36,19 @@
             IntPtr processAddress,
             int length)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("the buffer parameter cannot be null");
+            }
+
             lock (this)
             {
                 int bufferIndex = 0;
                 Request request = new Request(ReadMemoryRequestType, this.processId, processAddress, length);
-                
+
                 // For debbuging
-                // Console.WriteLine($"Requested address = {processAddress.ToString("X")}, length = {length}");  
-                    
+                // Console.WriteLine($"Requested address = {processAddress.ToString("X")}, length = {length}");
+
                 int bytesRec = 0;
                 try
                 {
@@ -72,8 +77,8 @@
                 }
                 catch (ArgumentException ae)
                 {
-                    Console.WriteLine($"address = {processAddress.ToString("X")}, length = {length}, Bytes Rec = {bytesRec}, bufferIndex = {bufferIndex}, buffer length = {buffer.Length}");  
-                    Console.WriteLine("ArgumentException : {0}", ae.ToString());                
+                    Console.WriteLine($"address = {processAddress.ToString("X")}, length = {length}, Bytes Rec = {bytesRec}, bufferIndex = {bufferIndex}, buffer length = {buffer.Length}");
+                    Console.WriteLine("ArgumentException : {0}", ae.ToString());
                     this.CloseConnection();
                 }
                 catch (SocketException se)
@@ -132,7 +137,7 @@
                     Console.WriteLine("Unexpected exception : {0}", e.ToString());
                     this.CloseConnection();
                 }
-                
+
                 throw new Exception($"Could not find the {moduleName} module");
             }
         }
@@ -218,7 +223,7 @@
             public byte[] GetBytes()
             {
                 byte[] arr = new byte[RequestSize];
-                arr[0] = type;
+                arr[0] = this.type;
 
                 IntPtr ptr = Marshal.AllocHGlobal(RequestSize);
                 Marshal.StructureToPtr(this, ptr, true);

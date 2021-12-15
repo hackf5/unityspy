@@ -76,7 +76,7 @@
                 var monoGenericContextPtr = monoGenericClassAddress + this.Process.SizeOfPtr;
                 var monoGenericInsPtr = this.Process.ReadPtr(monoGenericContextPtr);
 
-                //var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
+                // var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
                 var argumentCount = this.Process.ReadInt32(monoGenericContainerAddress + (4 * this.Process.SizeOfPtr));
                 var typeArgVPtr = monoGenericInsPtr + 0x8;
                 this.genericTypeArguments = new List<TypeInfo>(argumentCount);

@@ -35,6 +35,10 @@
 
         private string memPseudoFilePath;
 
+        private string dumpFilesPath;
+
+        private string mapsFilePath;
+
         private string gameExecutableFilePath;       
 
         private ProcessFacade processFacade; 
@@ -46,7 +50,9 @@
             this.mainWindow = mainWindow;
             this.processesCollection = new ObservableCollection<ProcessViewModel>();
             this.RefreshProcesses = ReactiveCommand.Create(this.StartRefresh);
-            this.OpenMemPseudoFile = ReactiveCommand.Create(this.StartOpenMemPseudoFile);  
+            this.OpenMemPseudoFile = ReactiveCommand.Create(this.StartOpenMemPseudoFile);
+            this.OpenDumpFilesDirectory = ReactiveCommand.Create(this.StartOpenDumpFilesDirectory);  
+            this.OpenMapsFile = ReactiveCommand.Create(this.StartOpenMapsFile); 
             this.OpenGameExecutableFile = ReactiveCommand.Create(this.StartOpenGameExecutableFile);   
             this.BuildImageAssembly = ReactiveCommand.Create(this.StartBuildImageAssembly); 
             this.ReadRawMemory = ReactiveCommand.Create(this.StartReadRawMemory);
@@ -88,6 +94,18 @@
             get => this.memPseudoFilePath;
             set => this.RaiseAndSetIfChanged(ref this.memPseudoFilePath, value);
         }
+
+        public string DumpFilesPath
+        {
+            get => this.dumpFilesPath;
+            set => this.RaiseAndSetIfChanged(ref this.dumpFilesPath, value);
+        }
+
+        public string MapsFilePath
+        {
+            get => this.mapsFilePath;
+            set => this.RaiseAndSetIfChanged(ref this.mapsFilePath, value);
+        }
                                 
         public string GameExecutableFilePath
         {
@@ -101,10 +119,13 @@
             set {
                 this.RaiseAndSetIfChanged(ref this.linuxModeSelectedIndex, value); 
                 this.RaisePropertyChanged(nameof(IsLinuxDirectMode)); 
+                this.RaisePropertyChanged(nameof(IsLinuxDumpMode)); 
             }
         }
 
         public bool IsLinuxDirectMode => IsLinux && LinuxModeSelectedIndex == 0;
+
+        public bool IsLinuxDumpMode => IsLinux && LinuxModeSelectedIndex == 3;
 
         public AssemblyImageViewModel Image
         {
@@ -115,6 +136,10 @@
         public ReactiveCommand<Unit, Unit> RefreshProcesses { get; }
         
         public ReactiveCommand<Unit, Unit> OpenMemPseudoFile { get; }
+        
+        public ReactiveCommand<Unit, Unit> OpenDumpFilesDirectory { get; }
+        
+        public ReactiveCommand<Unit, Unit> OpenMapsFile { get; }
                 
         public ReactiveCommand<Unit, Unit> OpenGameExecutableFile { get; }
         
@@ -127,9 +152,19 @@
             Task.Run(this.ExecuteRefreshProcesses);
         }
 
+        private void StartOpenMapsFile() 
+        {
+            Task.Run(this.ExecuteOpenMapsFileCommand);
+        }
+
         private void StartOpenMemPseudoFile() 
         {
             Task.Run(this.ExecuteOpenMemPseudoFileCommand);
+        }
+
+        private void StartOpenDumpFilesDirectory() 
+        {
+            Task.Run(this.ExecuteOpenDumpFilesDirectoryCommand);
         }
 
         private void StartOpenGameExecutableFile() 
@@ -159,7 +194,17 @@
             }
 
             this.SelectedProcess = this.Processes.FirstOrDefault(p => p.Name == "MTGA.exe"); 
-        }     
+        }   
+        
+        private async void ExecuteOpenMapsFileCommand()
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			var filenames = await this.ShowOpenFileDialog("Open /proc/$pid/maps file", this.mapsFilePath);
+			if (filenames != null && filenames.Length > 0)
+			{
+                this.MapsFilePath = filenames[0];
+			}
+		}
         
         private async void ExecuteOpenMemPseudoFileCommand()
 		{
@@ -171,9 +216,17 @@
 			}
 		}
         
+        private async void ExecuteOpenDumpFilesDirectoryCommand()
+		{
+			OpenFolderDialog dlg = new OpenFolderDialog();
+			dlg.Title = "Open dump files directory";
+            dlg.Directory = this.dumpFilesPath;
+
+			this.DumpFilesPath = await dlg.ShowAsync(mainWindow);
+		}
+        
         private async void ExecuteOpenGameExecutableFileCommand()
 		{
-			OpenFileDialog dlg = new OpenFileDialog();
 			var filenames = await this.ShowOpenFileDialog("Open game executable file", this.gameExecutableFilePath);
 			if (filenames != null && filenames.Length > 0)
 			{
@@ -303,6 +356,9 @@
                         break;
                     case 2:
                         this.processFacade = new ProcessFacadeLinuxPTrace(this.selectedProcess.Id);
+                        break;
+                    case 3:
+                        this.processFacade = new ProcessFacadeLinuxDump(this.MapsFilePath, this.DumpFilesPath);
                         break;
                     default:
                         throw new NotSupportedException("Linux mode not supported");
