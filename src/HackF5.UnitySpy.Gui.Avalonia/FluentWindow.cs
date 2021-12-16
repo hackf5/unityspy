@@ -1,6 +1,7 @@
 ﻿namespace Avalonia.Controls
 {
     using System;
+    using System.Runtime.InteropServices;
     using Avalonia.Styling;
     using Avalonia.Platform;
     using Avalonia.Controls.Primitives;
@@ -12,9 +13,21 @@
         public FluentWindow()
         {
             ExtendClientAreaToDecorationsHint = true;
-            ExtendClientAreaTitleBarHeightHint = -1;            
+            ExtendClientAreaTitleBarHeightHint = -1;
 
-            TransparencyLevelHint = WindowTransparencyLevel.AcrylicBlur;            
+            WindowTransparencyLevel transparencyLevel;
+
+            // Blur background looks weird in windows
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                transparencyLevel = WindowTransparencyLevel.None;
+            }
+            else
+            {
+                transparencyLevel = WindowTransparencyLevel.AcrylicBlur;
+            }
+
+            TransparencyLevelHint = transparencyLevel;            
 
             this.GetObservable(WindowStateProperty)
                 .Subscribe(x =>
@@ -29,7 +42,7 @@
                     if (!x)
                     {
                         SystemDecorations = SystemDecorations.Full;
-                        TransparencyLevelHint = WindowTransparencyLevel.Blur;
+                        TransparencyLevelHint = transparencyLevel;
                     }
                 });
         }
