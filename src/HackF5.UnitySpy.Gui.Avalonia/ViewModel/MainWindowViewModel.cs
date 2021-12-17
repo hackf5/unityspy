@@ -385,14 +385,14 @@
         {
             if(this.ModeSelectedIndex == 1)
             {
-                this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.MemPseudoFilePath);                        
+                this.processFacade = new ProcessFacadeLinuxDump(this.mapsFilePath, this.dumpFilesPath);                        
             }
             else if (this.IsLinux)
             {
                 switch(this.ModeSelectedIndex)
                 {
                     case 0:
-                        this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.MemPseudoFilePath);
+                        this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.memPseudoFilePath);
                         break;
                     case 2:
                         this.processFacade = new ProcessFacadeLinuxClient(this.selectedProcess.Id);
