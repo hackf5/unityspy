@@ -50,37 +50,40 @@
                 throw new ArgumentNullException("the buffer parameter cannot be null");
             }
 
-            foreach (MemoryMapping dumpFile in this.dumpFiles)
+            lock (this.dumpFiles)
             {
-                if (dumpFile.Contains(processAddress))
+                foreach (MemoryMapping dumpFile in this.dumpFiles)
                 {
-                    using (FileStream memFileStream = new FileStream(dumpFile.ModuleName, FileMode.Open))
+                    if (dumpFile.Contains(processAddress))
                     {
-                        long fileOffset = processAddress.ToInt64() - dumpFile.StartAddress.ToInt64();
-                        memFileStream.Seek(fileOffset, 0);
-
-                        if (fileOffset + length < dumpFile.Size)
+                        using (FileStream memFileStream = new FileStream(dumpFile.ModuleName, FileMode.Open))
                         {
-                            if (length != memFileStream.Read(buffer, bufferIndex, length))
+                            long fileOffset = processAddress.ToInt64() - dumpFile.StartAddress.ToInt64();
+                            memFileStream.Seek(fileOffset, 0);
+
+                            if (fileOffset + length < dumpFile.Size)
                             {
-                                throw new Exception("Error reading data from " + dumpFile.ModuleName);
+                                if (length != memFileStream.Read(buffer, bufferIndex, length))
+                                {
+                                    throw new Exception("Error reading data from " + dumpFile.ModuleName);
+                                }
+                            }
+                            else
+                            {
+                                int bytesToReadInCurrentFile = Convert.ToInt32(dumpFile.Size - fileOffset);
+                                if (bytesToReadInCurrentFile != memFileStream.Read(buffer, bufferIndex, bytesToReadInCurrentFile))
+                                {
+                                    throw new Exception("Error reading data from " + dumpFile.ModuleName);
+                                }
+
+                                int newBufferIndex = bufferIndex + bytesToReadInCurrentFile;
+                                int newLength = length - bytesToReadInCurrentFile;
+                                this.ReadProcessMemory(buffer, dumpFile.EndAddress, newBufferIndex, newLength);
                             }
                         }
-                        else
-                        {
-                            int bytesToReadInCurrentFile = Convert.ToInt32(dumpFile.Size - fileOffset);
-                            if (bytesToReadInCurrentFile != memFileStream.Read(buffer, bufferIndex, bytesToReadInCurrentFile))
-                            {
-                                throw new Exception("Error reading data from " + dumpFile.ModuleName);
-                            }
 
-                            int newBufferIndex = bufferIndex + bytesToReadInCurrentFile;
-                            int newLength = length - bytesToReadInCurrentFile;
-                            this.ReadProcessMemory(buffer, dumpFile.EndAddress, newBufferIndex, newLength);
-                        }
+                        return;
                     }
-
-                    return;
                 }
             }
         }

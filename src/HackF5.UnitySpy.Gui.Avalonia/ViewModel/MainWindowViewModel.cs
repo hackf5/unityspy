@@ -307,13 +307,27 @@
 
                 if (this.IsWindows)      
                 {
-                    ProcessFacadeWindows windowsProcessFacade = this.processFacade as ProcessFacadeWindows;
-                    monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(windowsProcessFacade.GetMainModuleFileName());
+                    if (this.IsDumpMode)
+                    {
+                        monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(this.gameExecutableFilePath);
+                    }
+                    else
+                    {
+                        ProcessFacadeWindows windowsProcessFacade = this.processFacade as ProcessFacadeWindows;
+                        monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(windowsProcessFacade.GetMainModuleFileName());
+                    }
                 }
                 else if (this.IsMacOS)
-                {   
-                    ProcessFacadeMacOS macOSProcessFacade = this.processFacade as ProcessFacadeMacOS;
-                    monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(macOSProcessFacade.Process.MainModule.FileName);
+                {
+                    if (this.IsDumpMode)
+                    {
+                        monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(this.gameExecutableFilePath);
+                    }
+                    else
+                    {
+                        ProcessFacadeMacOS macOSProcessFacade = this.processFacade as ProcessFacadeMacOS;
+                        monoLibraryOffsets = MonoLibraryOffsets.GetOffsets(macOSProcessFacade.Process.MainModule.FileName);
+                    }
                 }
                 else if (this.IsLinux)
                 { 
@@ -379,17 +393,17 @@
             }
 
             Console.WriteLine($"========= Type Definitions Read = {assemblyImage.TypeDefinitions.Count()} Has PAPA = {hasPapa} =========");
-        }    
+        }
 
         private void CreateProcessFacade()
         {
-            if(this.ModeSelectedIndex == 1)
+            if (this.ModeSelectedIndex == 1)
             {
-                this.processFacade = new ProcessFacadeLinuxDump(this.mapsFilePath, this.dumpFilesPath);                        
+                this.processFacade = new ProcessFacadeLinuxDump(this.mapsFilePath, this.dumpFilesPath);
             }
             else if (this.IsLinux)
             {
-                switch(this.ModeSelectedIndex)
+                switch (this.ModeSelectedIndex)
                 {
                     case 0:
                         this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.memPseudoFilePath);
@@ -404,16 +418,16 @@
                         throw new NotSupportedException("Linux mode not supported");
                 }
             }
-            else 
+            else
             {
-                Process process = Process.GetProcessById(this.selectedProcess.Id);                
-                if (this.IsWindows)      
+                Process process = Process.GetProcessById(this.selectedProcess.Id);
+                if (this.IsWindows)
                 {
                     this.processFacade = new ProcessFacadeWindows(process);
                 }
                 else if (this.IsMacOS)
-                {   
-                    switch(this.ModeSelectedIndex)
+                {
+                    switch (this.ModeSelectedIndex)
                     {
                         case 0:
                             this.processFacade = new ProcessFacadeMacOSDirect(process);
@@ -431,8 +445,14 @@
                 }
             }
 
-            Dispatcher.UIThread.InvokeAsync(() => 
-                ((RawMemoryViewModel)this.rawMemoryView.DataContext).Process = this.processFacade);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                RawMemoryViewModel rawMemoryViewModel = (RawMemoryViewModel)this.rawMemoryView.DataContext;
+                if (rawMemoryViewModel != null)
+                {
+                    rawMemoryViewModel.Process = this.processFacade;
+                }
+            });
         }
     }
 }

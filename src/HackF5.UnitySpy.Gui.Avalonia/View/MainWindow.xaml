@@ -81,9 +81,9 @@
       <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Text="{Binding MemPseudoFilePath, Mode=TwoWay}" />
       <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Command="{Binding OpenMemPseudoFile}">Open</Button>
       
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" >Game Executable File</TextBlock>
-      <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
-      <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" Command="{Binding OpenGameExecutableFile}">Open</Button>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneWay}" >Game Executable File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneWay}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneWay}" Command="{Binding OpenGameExecutableFile}">Open</Button>
       
       <Button    Margin="2" Grid.Column="0" Grid.Row="4" Command="{Binding BuildImageAssembly}">Read Assembly</Button>
       <Button    Margin="2" Grid.Column="1" Grid.Row="4" Command="{Binding ReadRawMemory}" HorizontalAlignment="Left">Read Raw</Button>
