@@ -3,7 +3,7 @@
     using global::Avalonia.Controls;
     using global::Avalonia.Markup.Xaml;
 
-    public class MainWindow : FluentWindow
+    public class MainWindow : Window
     {
         public MainWindow()
         {   

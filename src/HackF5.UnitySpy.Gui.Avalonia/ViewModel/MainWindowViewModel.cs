@@ -31,7 +31,7 @@
 
         private RawMemoryView rawMemoryView;
 
-        private int linuxModeSelectedIndex = 0;
+        private int modeSelectedIndex = 0;
 
         private string memPseudoFilePath;
 
@@ -65,7 +65,43 @@
 
         public bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-        public bool IsMacOS => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);   
+        public bool IsMacOS => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+        public string[] Modes
+        {
+            get
+            {
+                if (IsWindows)
+                {
+                    return new string[]
+                    {
+                        "Direct",
+                        "Linux Dump Files"
+                    };
+                }
+                else if (IsMacOS)
+                {
+                    return new string[]
+                    {
+                        "Direct (root access)",
+                        "Linux Dump Files",
+                        "Client (user access) - server.c (root access)"
+                    };
+                }
+                if (IsLinux)
+                {
+                    return new string[]
+                    {
+                        "Direct (root access)",
+                        "Dump Files",
+                        "Client (user access) - server.c (root access)",
+                        "PTrace (process_vm_readv)"
+                    };
+                }
+
+                return null;
+            }
+        }
         
         public ObservableCollection<ProcessViewModel> Processes => this.processesCollection;
 
@@ -113,19 +149,22 @@
             set => this.RaiseAndSetIfChanged(ref this.gameExecutableFilePath, value);
         }
                                 
-        public int LinuxModeSelectedIndex
+        public int ModeSelectedIndex
         {
-            get => this.linuxModeSelectedIndex;
+            get => this.modeSelectedIndex;
             set {
-                this.RaiseAndSetIfChanged(ref this.linuxModeSelectedIndex, value); 
-                this.RaisePropertyChanged(nameof(IsLinuxDirectMode)); 
-                this.RaisePropertyChanged(nameof(IsLinuxDumpMode)); 
+                this.RaiseAndSetIfChanged(ref this.modeSelectedIndex, value);
+                this.RaisePropertyChanged(nameof(IsLinuxDirectMode));
+                this.RaisePropertyChanged(nameof(IsDumpMode));
+                this.RaisePropertyChanged(nameof(NeedsGameExecutableFile));
             }
         }
 
-        public bool IsLinuxDirectMode => IsLinux && LinuxModeSelectedIndex == 0;
+        public bool IsLinuxDirectMode => IsLinux && ModeSelectedIndex == 0;
 
-        public bool IsLinuxDumpMode => IsLinux && LinuxModeSelectedIndex == 3;
+        public bool IsDumpMode => ModeSelectedIndex == 1;
+
+        public bool NeedsGameExecutableFile => IsLinux || IsDumpMode;
 
         public AssemblyImageViewModel Image
         {
@@ -344,21 +383,22 @@
 
         private void CreateProcessFacade()
         {
-            if (this.IsLinux)
+            if(this.ModeSelectedIndex == 1)
             {
-                switch(this.LinuxModeSelectedIndex)
+                this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.MemPseudoFilePath);                        
+            }
+            else if (this.IsLinux)
+            {
+                switch(this.ModeSelectedIndex)
                 {
                     case 0:
                         this.processFacade = new ProcessFacadeLinuxDirect(this.selectedProcess.Id, this.MemPseudoFilePath);
                         break;
-                    case 1:
+                    case 2:
                         this.processFacade = new ProcessFacadeLinuxClient(this.selectedProcess.Id);
                         break;
-                    case 2:
-                        this.processFacade = new ProcessFacadeLinuxPTrace(this.selectedProcess.Id);
-                        break;
                     case 3:
-                        this.processFacade = new ProcessFacadeLinuxDump(this.MapsFilePath, this.DumpFilesPath);
+                        this.processFacade = new ProcessFacadeLinuxPTrace(this.selectedProcess.Id);
                         break;
                     default:
                         throw new NotSupportedException("Linux mode not supported");
@@ -366,14 +406,24 @@
             }
             else 
             {
-                Process process = Process.GetProcessById(this.selectedProcess.Id);
+                Process process = Process.GetProcessById(this.selectedProcess.Id);                
                 if (this.IsWindows)      
                 {
                     this.processFacade = new ProcessFacadeWindows(process);
                 }
                 else if (this.IsMacOS)
                 {   
-                    this.processFacade = new ProcessFacadeMacOSDirect(process);
+                    switch(this.ModeSelectedIndex)
+                    {
+                        case 0:
+                            this.processFacade = new ProcessFacadeMacOSDirect(process);
+                            break;
+                        case 2:
+                            this.processFacade = new ProcessFacadeMacOSClient(process);
+                            break;
+                        default:
+                            throw new NotSupportedException("MacOS mode not supported");
+                    }
                 }
                 else
                 {

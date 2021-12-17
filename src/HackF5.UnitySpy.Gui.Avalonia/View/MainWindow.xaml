@@ -1,5 +1,4 @@
-﻿<FluentWindow 
-        x:Class="HackF5.UnitySpy.Gui.Avalonia.View.MainWindow"
+﻿<Window x:Class="HackF5.UnitySpy.Gui.Avalonia.View.MainWindow"
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel;assembly=HackF5.UnitySpy.Gui.Avalonia"
@@ -12,12 +11,6 @@
         WindowStartupLocation="CenterScreen"
         Background="{x:Null}"
         Title="Unity Spy">
-
-  <FluentWindow.Styles>
-    <Style Selector="TitleBar:fullscreen">
-      <Setter Property="Background" Value="#7f000000" />
-    </Style>
-  </FluentWindow.Styles>
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
@@ -40,26 +33,29 @@
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
       
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="0" IsVisible="{Binding IsLinux, Mode=OneTime}">Mode</TextBlock>   
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="0">Mode</TextBlock>   
       <ComboBox 
+        Name="ModeComboBox"
         Grid.Row="0"
         Grid.Column="1"
         Margin="2"
         HorizontalAlignment="Stretch"
-        IsVisible="{Binding IsLinux}" SelectedIndex="{Binding LinuxModeSelectedIndex, Mode=TwoWay}">
-          <ComboBoxItem>Direct (root access)</ComboBoxItem>
-          <ComboBoxItem>Client (user access) - server.c (root access)</ComboBoxItem>
-          <ComboBoxItem>PTrace (process_vm_readv)</ComboBoxItem>
-          <ComboBoxItem>Dump Files</ComboBoxItem>
+        Items="{Binding Modes, Mode=OneWay}"
+        SelectedIndex="{Binding ModeSelectedIndex, Mode=TwoWay}">
+        <ComboBox.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding}"/>
+            </DataTemplate>
+        </ComboBox.ItemTemplate>
       </ComboBox>
 
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}">Process</TextBlock>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding !IsDumpMode, Mode=OneWay}">Process</TextBlock>
       <ComboBox 
         Grid.Row="1"
         Grid.Column="1"
         Classes="header" 
         x:Name="processesComboBox"
-        IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}"
+        IsVisible="{Binding !IsDumpMode, Mode=OneWay}"
         Items="{Binding Processes}"         
         SelectedItem="{Binding SelectedProcess, Mode=TwoWay}"
         HorizontalAlignment="Stretch"
@@ -71,23 +67,23 @@
         </ComboBox.ItemTemplate>
       </ComboBox>
 
-      <Button Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding !IsLinuxDumpMode, Mode=OneWay}" Command="{Binding RefreshProcesses}">Refresh</Button>
+      <Button Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding !IsDumpMode, Mode=OneWay}" Command="{Binding RefreshProcesses}">Refresh</Button>
 
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" >Maps File</TextBlock>
-      <TextBox   Margin="2" Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Text="{Binding MapsFilePath, Mode=TwoWay}" />
-      <Button    Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Command="{Binding OpenMapsFile}">Open</Button>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="1" IsVisible="{Binding IsDumpMode, Mode=OneWay}" >Maps File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="1" IsVisible="{Binding IsDumpMode, Mode=OneWay}" Text="{Binding MapsFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="1" IsVisible="{Binding IsDumpMode, Mode=OneWay}" Command="{Binding OpenMapsFile}">Open</Button>
 
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" >Dump Files Path</TextBlock>
-      <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Text="{Binding DumpFilesPath, Mode=TwoWay}" />
-      <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDumpMode, Mode=OneWay}" Command="{Binding OpenDumpFilesDirectory}">Open</Button>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsDumpMode, Mode=OneWay}" >Dump Files Path</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsDumpMode, Mode=OneWay}" Text="{Binding DumpFilesPath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsDumpMode, Mode=OneWay}" Command="{Binding OpenDumpFilesDirectory}">Open</Button>
 
       <TextBlock Margin="2" Grid.Column="0" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" >Mem File</TextBlock>
       <TextBox   Margin="2" Grid.Column="1" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Text="{Binding MemPseudoFilePath, Mode=TwoWay}" />
       <Button    Margin="2" Grid.Column="2" Grid.Row="2" IsVisible="{Binding IsLinuxDirectMode, Mode=OneWay}" Command="{Binding OpenMemPseudoFile}">Open</Button>
       
-      <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" >Game Executable File</TextBlock>
-      <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
-      <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding isLinux, Mode=OneTime}" Command="{Binding OpenGameExecutableFile}">Open</Button>
+      <TextBlock Margin="2" Grid.Column="0" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" >Game Executable File</TextBlock>
+      <TextBox   Margin="2" Grid.Column="1" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" Text="{Binding GameExecutableFilePath, Mode=TwoWay}" />
+      <Button    Margin="2" Grid.Column="2" Grid.Row="3" IsVisible="{Binding NeedsGameExecutableFile, Mode=OneTime}" Command="{Binding OpenGameExecutableFile}">Open</Button>
       
       <Button    Margin="2" Grid.Column="0" Grid.Row="4" Command="{Binding BuildImageAssembly}">Read Assembly</Button>
       <Button    Margin="2" Grid.Column="1" Grid.Row="4" Command="{Binding ReadRawMemory}" HorizontalAlignment="Left">Read Raw</Button>
@@ -99,4 +95,4 @@
 
   </DockPanel>
 
-</FluentWindow>
+</Window>
