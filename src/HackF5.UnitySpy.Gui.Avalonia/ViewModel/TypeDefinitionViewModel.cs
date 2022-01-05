@@ -64,6 +64,8 @@
             set => this.RaiseAndSetIfChanged(ref this.content, value);
         }
 
+        public ITypeDefinition Definition => this.definition;
+
         public string FullName => this.definition.FullName;
 
         public bool HasStaticFields => this.definition.Fields.Any(f => f.TypeInfo.IsStatic && !f.TypeInfo.IsConstant);
@@ -76,9 +78,7 @@
                 if(this.path != value)
                 {
                     this.RaiseAndSetIfChanged(ref this.path, value);
-
                     this.ParsePath(this.Path ?? string.Empty);
-
                     this.RaisePropertyChanged(nameof(CanExecutePathBack));
                 }
             }

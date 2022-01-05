@@ -2,6 +2,7 @@
 {
     using Autofac;
     using global::Avalonia;
+    using global::Avalonia.Controls;
     using global::Avalonia.Controls.ApplicationLifetimes;
     using global::Avalonia.Markup.Xaml;
     using HackF5.UnitySpy.Gui.Mvvm;
@@ -27,6 +28,7 @@
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.DataContext = new MainWindowViewModel(mainWindow);
                 desktop.MainWindow = mainWindow;
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
             }
 
             var builder = new ContainerBuilder();

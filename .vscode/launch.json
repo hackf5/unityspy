@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/HackF5.UnitySpy.Gui.Avalonia/bin/Debug/netcoreapp3.1/HackF5.UnitySpy.Gui.Avalonia",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/HackF5.UnitySpy.Gui.Avalonia/bin/Debug/",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+        
+    ]
+}

@@ -3,18 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel;assembly=HackF5.UnitySpy.Gui.Avalonia"
-        xmlns:viewModel="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel"
-        d:DataContext="{d:DesignInstance viewModel:RawMemoryViewModel}"
+        xmlns:vm="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel;assembly=HackF5.UnitySpy.Gui.Avalonia"        
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Background="{x:Null}"
         Title="Raw Memory Viewer"
         MinWidth="200" >
 
-    <!-- <Design.DataContext>
-        <vm:RawMemoryView/>
-    </Design.DataContext> -->
-    
+    <Design.DataContext>
+        <vm:RawMemoryViewModel/>
+    </Design.DataContext>    
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Margin="2" Orientation="Horizontal">

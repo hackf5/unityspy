@@ -13,6 +13,7 @@
     using global::Avalonia.Threading;
     using HackF5.UnitySpy.Offsets;
     using HackF5.UnitySpy.ProcessFacade;
+    using HackF5.UnitySpy.Detail;
     using HackF5.UnitySpy.Util;
     using HackF5.UnitySpy.Gui.Avalonia.Mvvm;
     using HackF5.UnitySpy.Gui.Avalonia.View;
@@ -289,9 +290,16 @@
             if (this.processFacade == null)
             {
                 this.CreateProcessFacade();
+                await this.rawMemoryView.ShowDialog(this.mainWindow);
+            } 
+            else if (/*this.Image.SelectedType != null && */this.Image.SelectedType.Definition is TypeDefinition typeDefinition)
+            {
+                await this.rawMemoryView.ShowDialog(this.mainWindow, typeDefinition.Address);
             }
-
-            await this.rawMemoryView.ShowDialog(this.mainWindow);
+            else
+            {
+                await this.rawMemoryView.ShowDialog(this.mainWindow);
+            }
         }
         
         private async Task BuildImageAsync()

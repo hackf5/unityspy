@@ -3,19 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
     using System.Reactive;
-    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading.Tasks;
     using global::Avalonia.Controls;
-    using HackF5.UnitySpy.Detail;
     using HackF5.UnitySpy.ProcessFacade;
     using HackF5.UnitySpy.Util;
-    using HackF5.UnitySpy.Gui.Avalonia.Mvvm;
-    using HackF5.UnitySpy.Gui.Avalonia.View;
     using ReactiveUI;
 
     public class RawMemoryViewModel : ReactiveObject
@@ -31,6 +24,7 @@
         public RawMemoryViewModel()
         {
             this.Refresh = ReactiveCommand.Create(this.StartRefresh);
+            this.StartRefresh();
         }     
 
         public ProcessFacade Process
@@ -48,7 +42,7 @@
         {
             get => this.bufferSize;
             set {
-                if(bufferSize != value)
+                if(this.bufferSize != value)
                 {
                     this.RaiseAndSetIfChanged(ref this.bufferSize, value);    
                     this.InitBuffer();             
@@ -61,7 +55,7 @@
         {
             get => this.startAddress;
             set {
-                if(startAddress != value)
+                if(this.startAddress != value)
                 {
                     this.RaiseAndSetIfChanged(ref this.startAddress, value);                 
                     this.StartRefresh();
@@ -76,7 +70,7 @@
 
         private void InitBuffer()
         {
-            buffer = new byte[int.Parse(bufferSize)];
+            this.buffer = new byte[int.Parse(this.bufferSize)];
         }
 
         private void StartRefresh() 
@@ -86,17 +80,22 @@
 
         private void ExecuteRefresh()
         {
+            if (this.process == null)
+            {
+                return;
+            }
+
             if (this.buffer == null)
             {
                 this.InitBuffer();
             }
-            IntPtr startAddressPtr = new IntPtr(Convert.ToInt64(startAddress, 16));
-            this.process.ReadProcessMemory(buffer, startAddressPtr, true, buffer.Length);
+            IntPtr startAddressPtr = new IntPtr(Convert.ToInt64(this.startAddress, 16));
+            this.process.ReadProcessMemory(this.buffer, startAddressPtr, true, this.buffer.Length);
 
             this.BufferLines.Clear();
 
             int bytesPerLine = 32;            
-            for (int i = 0; i < buffer.Length; i+=bytesPerLine)
+            for (int i = 0; i < this.buffer.Length; i += bytesPerLine)
             {
                 IntPtr address = startAddressPtr + i;
                 StringBuilder line = new StringBuilder(address.ToString("X"));
@@ -104,9 +103,9 @@
                 StringBuilder charLine = new StringBuilder();
                 for (int j = 0; j < bytesPerLine; j++)
                 {
-                    line.Append(buffer[i + j].ToString("X"));
-                    line.Append(" ");
-                    charLine.Append(ToAsciiSymbol(buffer[i + j]));
+                    line.Append(buffer[i + j].ToString("X2"));
+                    line.Append(' ');
+                    charLine.Append(ToAsciiSymbol(this.buffer[i + j]));
                 }
                 line.Append(charLine);
                 this.BufferLines.Add(line.ToString());
