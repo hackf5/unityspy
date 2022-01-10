@@ -237,14 +237,6 @@
         private object ReadManagedVar(TypeInfo type, List<TypeInfo> genericTypeArguments, IntPtr address)
         {
             var monoGenericParamPtr = type.Data;
-            var monoGenericParamAddress = this.ReadPtr(monoGenericParamPtr);
-
-            //// we need to move three pointer sizes to get to the MonoClass Pointer
-            // See _MonoGenericContainer
-            // (https://github.com/Unity-Technologies/mono/blob/unity-master/mono/metadata/class-internals.h)
-            // var genericDefinitionPtr = monoGenericContainerAddress + (3 * this.SizeOfPtr);
-            // var genericDefinition = type.Image.GetTypeDefinition(this.ReadPtr(genericDefinitionPtr));
-
             int numberOfGenericArgument = this.ReadInt32(monoGenericParamPtr + this.SizeOfPtr);
 
             int offset = 0;
