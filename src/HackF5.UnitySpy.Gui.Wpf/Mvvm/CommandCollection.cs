@@ -5,6 +5,7 @@
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Input;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using JetBrains.Annotations;
 
     [UsedImplicitly]

@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using System.Collections.Generic;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -12,8 +13,8 @@
     [PublicAPI]
     public class ManagedStructInstance : ManagedObjectInstance
     {
-        public ManagedStructInstance([NotNull] TypeDefinition typeDefinition, IntPtr address)
-            : base((typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition))).Image, address)
+        public ManagedStructInstance([NotNull] TypeDefinition typeDefinition, List<TypeInfo> genericTypeArguments, IntPtr address)
+            : base((typeDefinition ?? throw new ArgumentNullException(nameof(typeDefinition))).Image, genericTypeArguments, address)
         {
             // value type pointers contain no type information as a significant performance optimization. in memory
             // a value type is simply a contiguous sequence of bytes and it is up to the runtime to know how to

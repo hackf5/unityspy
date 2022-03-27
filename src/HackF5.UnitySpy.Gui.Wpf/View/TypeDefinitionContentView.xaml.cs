@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Gui.Wpf.View
 {
     using System.Windows.Input;
+    using HackF5.UnitySpy.Gui.ViewModel;
     using HackF5.UnitySpy.Gui.Wpf.ViewModel;
 
     public partial class TypeDefinitionContentView

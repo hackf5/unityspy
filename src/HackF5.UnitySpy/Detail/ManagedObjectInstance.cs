@@ -1,12 +1,16 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using System.Collections.Generic;
 
     public abstract class ManagedObjectInstance : MemoryObject, IManagedObjectInstance
     {
-        protected ManagedObjectInstance(AssemblyImage image, IntPtr address)
+        private readonly List<TypeInfo> genericTypeArguments;
+
+        protected ManagedObjectInstance(AssemblyImage image, List<TypeInfo> genericTypeArguments, IntPtr address)
             : base(image, address)
         {
+            this.genericTypeArguments = genericTypeArguments;
         }
 
         ITypeDefinition IManagedObjectInstance.TypeDefinition => this.TypeDefinition;
@@ -25,7 +29,7 @@
                 ?? throw new ArgumentException(
                     $"No field exists with name {fieldName} in type {typeFullName ?? "<any>"}.");
 
-            return field.GetValue<TValue>(this.Address);
+            return field.GetValue<TValue>(this.genericTypeArguments, this.Address);
         }
     }
 }

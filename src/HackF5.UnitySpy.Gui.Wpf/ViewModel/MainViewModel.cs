@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using HackF5.UnitySpy.Gui.Wpf.Mvvm;
     using HackF5.UnitySpy.Offsets;
     using HackF5.UnitySpy.ProcessFacade;

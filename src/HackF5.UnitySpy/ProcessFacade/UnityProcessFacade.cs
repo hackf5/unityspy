@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.ProcessFacade
 {
     using System;
+    using System.Collections.Generic;
     using HackF5.UnitySpy.Detail;
     using HackF5.UnitySpy.Offsets;
     using JetBrains.Annotations;
@@ -44,8 +45,8 @@
 
         public long ReadInt64(IntPtr address) => this.process.ReadInt64(address);
 
-        public object ReadManaged([NotNull] TypeInfo type, IntPtr address)
-            => this.process.ReadManaged(type, address);
+        public object ReadManaged([NotNull] TypeInfo type, List<TypeInfo> genericTypeArguments, IntPtr address)
+            => this.process.ReadManaged(type, genericTypeArguments, address);
 
         public IntPtr ReadPtr(IntPtr address) => this.process.ReadPtr(address);
 
@@ -57,20 +58,6 @@
 
         public byte[] ReadModule([NotNull] ModuleInfo moduleInfo) => this.process.ReadModule(moduleInfo);
 
-        public ModuleInfo GetMonoModule()
-        {
-            string monoLibrary;
-
-            if (this.process is ProcessFacadeMacOS)
-            {
-                monoLibrary = this.monoLibraryOffsets.MonoLibraryName.MachOFormatName;
-            }
-            else
-            {
-                monoLibrary = this.monoLibraryOffsets.MonoLibraryName.PeFormatName;
-            }
-
-            return this.process.GetModule(monoLibrary);
-        }
+        public ModuleInfo GetMonoModule() => this.process.GetModule(this.monoLibraryOffsets.MonoLibrary);
     }
 }

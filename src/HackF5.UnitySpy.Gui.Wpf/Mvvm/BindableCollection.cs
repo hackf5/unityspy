@@ -5,6 +5,7 @@
     using System.Collections.Specialized;
     using System.ComponentModel;
     using System.Linq;
+    using HackF5.UnitySpy.Gui.Mvvm;
     using JetBrains.Annotations;
 
     [PublicAPI]

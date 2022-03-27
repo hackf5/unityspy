@@ -36,6 +36,8 @@
 
         private readonly Lazy<TypeDefinition> lazyGeneric;
 
+        private readonly List<TypeInfo> genericTypeArguments;
+
         public TypeDefinition([NotNull] AssemblyImage image, IntPtr address)
             : base(image, address)
         {
@@ -60,6 +62,34 @@
             this.TypeInfo = new TypeInfo(image, this.Address + image.Process.MonoLibraryOffsets.TypeDefinitionByValArg);
             this.VTableSize = vtablePtr == Constants.NullPtr ? 0 : this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionVTableSize);
             this.ClassKind = (MonoClassKind)(this.ReadByte(image.Process.MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
+
+            // Get the generic type arguments
+            if (this.TypeInfo.TypeCode == TypeCode.GENERICINST)
+            {
+                var monoGenericClassAddress = this.TypeInfo.Data;
+                var monoClassAddress = this.Process.ReadPtr(monoGenericClassAddress);
+                TypeDefinition monoClass = this.Image.GetTypeDefinition(monoClassAddress);
+
+                var monoGenericContainerPtr = monoClassAddress + this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer;
+                var monoGenericContainerAddress = this.Process.ReadPtr(monoGenericContainerPtr);
+
+                var monoGenericContextPtr = monoGenericClassAddress + this.Process.SizeOfPtr;
+                var monoGenericInsPtr = this.Process.ReadPtr(monoGenericContextPtr);
+
+                // var argumentCount = this.Process.ReadInt32(monoGenericInsPtr + 0x4);
+                var argumentCount = this.Process.ReadInt32(monoGenericContainerAddress + (4 * this.Process.SizeOfPtr));
+                var typeArgVPtr = monoGenericInsPtr + 0x8;
+                this.genericTypeArguments = new List<TypeInfo>(argumentCount);
+                for (int i = 0; i < argumentCount; i++)
+                {
+                    var genericTypeArgumentPtr = this.Process.ReadPtr(typeArgVPtr + (i * this.Process.SizeOfPtr));
+                    this.genericTypeArguments.Add(new TypeInfo(this.Image, monoGenericInsPtr));
+                }
+            }
+            else
+            {
+                this.genericTypeArguments = null;
+            }
         }
 
         IReadOnlyList<IFieldDefinition> ITypeDefinition.Fields => this.Fields;
@@ -91,6 +121,21 @@
         public int VTableSize { get; }
 
         public MonoClassKind ClassKind { get; }
+
+        public List<TypeInfo> GenericTypeArguments
+        {
+            get
+            {
+                if (this.genericTypeArguments == null && this.NestedIn != null)
+                {
+                    return this.NestedIn.GenericTypeArguments;
+                }
+                else
+                {
+                    return this.genericTypeArguments;
+                }
+            }
+        }
 
         public dynamic this[string fieldName] => this.GetStaticValue<dynamic>(fieldName);
 
@@ -212,7 +257,7 @@
                 return null;
             }
 
-            var genericContainerPtr = this.ReadPtr(this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer);
+            var genericContainerPtr = this.ReadPtr(this.Process.MonoLibraryOffsets.TypeDefinitionMonoGenericClass);
             return this.Image.GetTypeDefinition(this.Process.ReadPtr(genericContainerPtr));
         }
     }

@@ -1,7 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Gui.Wpf.ViewModel
 {
     using System.Diagnostics;
-    using HackF5.UnitySpy.Gui.Wpf.Mvvm;
+    using HackF5.UnitySpy.Gui.Mvvm;
 
     public class ProcessViewModel : PropertyChangedBase
     {

@@ -102,9 +102,6 @@
                 //// pointer to struct of type _MonoDomain
                 domain = process.ReadPtr(domainAddress);
             }
-
-            Console.WriteLine($"[DEBUG] Root Domain Address = {domain.ToString("X")}");
-
             //// pointer to array of structs of type _MonoAssembly
             var assemblyArrayAddress = process.ReadPtr(domain + process.MonoLibraryOffsets.ReferencedAssemblies);
             for (var assemblyAddress = assemblyArrayAddress;
@@ -116,7 +113,6 @@
                 var assemblyName = process.ReadAsciiString(assemblyNameAddress);
                 if (assemblyName == name)
                 {
-                    Console.WriteLine($"[DEBUG] Assembly name = {assemblyName}");
                     return new AssemblyImage(process, process.ReadPtr(assembly + process.MonoLibraryOffsets.AssemblyImage));
                 }
             }
@@ -188,8 +184,6 @@
                             rootDomainFunctionAddress = monoModuleInfo.BaseAddress
                                 + moduleFromPath.ToInt32(symbolTableOffset + (j * MachOFormatOffsets.SizeOfNListItem)
                                                             + MachOFormatOffsets.NListValue);
-
-                            Console.WriteLine($"[DEBUG] Found _mono_get_root_domain address = {rootDomainFunctionAddress.ToString("X")}");
                             break;
                         }
                     }

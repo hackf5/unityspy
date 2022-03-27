@@ -3,7 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using HackF5.UnitySpy.Gui.Wpf.Mvvm;
+    using HackF5.UnitySpy.Gui.Mvvm;
+    using HackF5.UnitySpy.Gui.ViewModel;
     using JetBrains.Annotations;
 
     public class TypeDefinitionContentViewModel : PropertyChangedBase

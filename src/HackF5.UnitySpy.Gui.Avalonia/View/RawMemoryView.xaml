@@ -1,0 +1,44 @@
+<Window x:Class="HackF5.UnitySpy.Gui.Avalonia.View.RawMemoryView"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:HackF5.UnitySpy.Gui.Avalonia.ViewModel;assembly=HackF5.UnitySpy.Gui.Avalonia"        
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Background="{x:Null}"
+        Title="Raw Memory Viewer"
+        MinWidth="200" >
+
+    <Design.DataContext>
+        <vm:RawMemoryViewModel/>
+    </Design.DataContext>    
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="2" Orientation="Horizontal">
+            <TextBlock Margin="2" >Start Address</TextBlock>
+            <TextBox   Margin="2" Text="{Binding StartAddress, Mode=TwoWay}" />
+            <TextBlock Margin="2" >Buffer Size</TextBlock>
+            <ComboBox 
+                Margin="2"
+                SelectedItem="{Binding BufferSize, Mode=TwoWay}">
+                <ComboBoxItem>256</ComboBoxItem>
+                <ComboBoxItem>512</ComboBoxItem>
+                <ComboBoxItem>1024</ComboBoxItem>
+            </ComboBox>
+            <Button Margin="2" Command="{Binding Refresh}">Refresh</Button>           
+        </StackPanel>     
+        <ListBox
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            Items="{Binding BufferLines, Mode=OneWay}"
+            VirtualizationMode="Simple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock
+                        Text="{Binding}" >
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>   
+    </DockPanel>
+</Window>

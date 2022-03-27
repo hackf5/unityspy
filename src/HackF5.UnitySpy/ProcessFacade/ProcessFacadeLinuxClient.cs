@@ -15,7 +15,7 @@
         public ProcessFacadeLinuxClient(int processId)
             : base(processId)
         {
-            this.client = new ProcessFacadeClient();
+            this.client = new ProcessFacadeClient(processId);
         }
 
         protected override void ReadProcessMemory(

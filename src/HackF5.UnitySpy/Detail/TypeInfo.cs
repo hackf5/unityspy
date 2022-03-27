@@ -1,6 +1,7 @@
 ﻿namespace HackF5.UnitySpy.Detail
 {
     using System;
+    using System.Collections.Generic;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -44,6 +45,7 @@
             }
         }
 
-        public object GetValue(IntPtr address) => this.Process.ReadManaged(this, address);
+        public object GetValue(List<TypeInfo> genericTypeArguments, IntPtr address)
+            => this.Process.ReadManaged(this, genericTypeArguments, address);
     }
 }
