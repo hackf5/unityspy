@@ -65,6 +65,7 @@
             // Get the generic type arguments
             if (this.TypeInfo.TypeCode == TypeCode.GENERICINST)
             {
+                this.fieldCount = this.ReadInt32(96);
                 var monoGenericClassAddress = this.TypeInfo.Data;
                 var monoClassAddress = this.Process.ReadPtr(monoGenericClassAddress);
                 this.Image.GetTypeDefinition(monoClassAddress);
@@ -159,7 +160,7 @@
             try
             {
                 var vTableMemorySize = this.Process.SizeOfPtr * this.VTableSize;
-                var valuePtr = this.Process.ReadPtr(this.VTable + this.Process.MonoLibraryOffsets.VTable + vTableMemorySize);
+                var valuePtr = this.Process.ReadPtr(this.VTable + /*this.Process.MonoLibraryOffsets.VTable*/72 + vTableMemorySize);
                 return field.GetValue<TValue>(valuePtr);
             }
             catch (Exception e)
@@ -193,7 +194,7 @@
             }
 
             var fields = new List<FieldDefinition>();
-            if (this.ClassKind == MonoClassKind.GInst)
+            if (this.ClassKind is MonoClassKind.GInst or MonoClassKind.GParam)
             {
                 fields.AddRange(this.GetGeneric().GetFields());
             }
@@ -248,13 +249,15 @@
 
         private TypeDefinition GetGeneric()
         {
-            if (this.ClassKind != MonoClassKind.GInst)
+            if (this.ClassKind is MonoClassKind.GInst or MonoClassKind.GParam)
+            {
+                var genericContainerPtr = this.ReadPtr(this.Process.MonoLibraryOffsets.TypeDefinitionMonoGenericClass);
+                return this.Image.GetTypeDefinition(this.Process.ReadPtr(genericContainerPtr));
+            }
+            else
             {
                 return null;
             }
-
-            var genericContainerPtr = this.ReadPtr(this.Process.MonoLibraryOffsets.TypeDefinitionMonoGenericClass);
-            return this.Image.GetTypeDefinition(this.Process.ReadPtr(genericContainerPtr));
         }
     }
 }

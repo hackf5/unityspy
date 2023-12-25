@@ -103,7 +103,7 @@
                 domain = process.ReadPtr(domainAddress);
             }
             //// pointer to array of structs of type _MonoAssembly
-            var assemblyArrayAddress = process.ReadPtr(domain + process.MonoLibraryOffsets.ReferencedAssemblies);
+            var assemblyArrayAddress = process.ReadPtr(domain + /*process.MonoLibraryOffsets.ReferencedAssemblies*/160);
             for (var assemblyAddress = assemblyArrayAddress;
                 assemblyAddress != IntPtr.Zero;
                 assemblyAddress = process.ReadPtr(assemblyAddress + process.SizeOfPtr))

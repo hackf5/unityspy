@@ -81,8 +81,8 @@
         {
             var definitions = new ConcurrentDictionary<IntPtr, TypeDefinition>();
             int classCache = this.Process.MonoLibraryOffsets.ImageClassCache;
-            var classCacheSize = this.ReadUInt32(classCache + this.Process.MonoLibraryOffsets.HashTableSize);
-            var classCacheTableArray = this.ReadPtr(classCache + this.Process.MonoLibraryOffsets.HashTableTable);
+            var classCacheSize = this.ReadUInt32(/*classCache + this.Process.MonoLibraryOffsets.HashTableSize*/1256);
+            var classCacheTableArray = this.ReadPtr(1264/*classCache + this.Process.MonoLibraryOffsets.HashTableTable*/);
 
             for (var tableItem = 0;
                 tableItem < (classCacheSize * this.Process.SizeOfPtr);
@@ -90,7 +90,7 @@
             {
                 for (var definition = this.Process.ReadPtr(classCacheTableArray + tableItem);
                     definition != IntPtr.Zero;
-                    definition = this.Process.ReadPtr(definition + this.Process.MonoLibraryOffsets.TypeDefinitionNextClassCache))
+                    definition = this.Process.ReadPtr(definition + /*this.Process.MonoLibraryOffsets.TypeDefinitionNextClassCache*/264))
                 {
                     definitions.GetOrAdd(definition, new TypeDefinition(this, definition));
                 }
