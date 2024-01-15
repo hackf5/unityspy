@@ -37,7 +37,7 @@
             {
                 var monoGenericClassAddress = this.TypeInfo.Data;
                 var monoClassAddress = this.Process.ReadPtr(monoGenericClassAddress);
-                TypeDefinition monoClass = this.Image.GetTypeDefinition(monoClassAddress);
+                this.Image.GetTypeDefinition(monoClassAddress);
 
                 var monoGenericContainerPtr = monoClassAddress + this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer;
                 var monoGenericContainerAddress = this.Process.ReadPtr(monoGenericContainerPtr);
@@ -80,24 +80,8 @@
 
         public TValue GetValue<TValue>(List<TypeInfo> genericTypeArguments, IntPtr address)
         {
-            int offset;
-            if (this.DeclaringType.IsValueType && !this.TypeInfo.IsStatic)
-            {
-                offset = this.Offset - (this.Process.SizeOfPtr * 2);
-            }
-            else
-            {
-                offset = this.Offset;
-            }
-
-            if (this.genericTypeArguments != null)
-            {
-                return (TValue)this.TypeInfo.GetValue(this.genericTypeArguments, address + offset);
-            }
-            else
-            {
-                return (TValue)this.TypeInfo.GetValue(genericTypeArguments, address + offset);
-            }
+            int offset = this.DeclaringType.IsValueType && !this.TypeInfo.IsStatic ? this.Offset - (this.Process.SizeOfPtr * 2) : this.Offset;
+            return (TValue)this.TypeInfo.GetValue(this.genericTypeArguments ?? genericTypeArguments, address + offset);
         }
     }
 }

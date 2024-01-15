@@ -40,14 +40,14 @@ namespace HackF5.UnitySpy.Util
 
             strBuilder.AppendLine("========================================== Reading Memory at " + addressStr + " Depth = " + recursiveDepth + " ========================================== ");
 
-            var ptr = Constants.NullPtr;
-            if (address != Constants.NullPtr)
+            var ptr = IntPtr.Zero;
+            if (address != IntPtr.Zero)
             {
                 try
                 {
                     ptr = this.process.ReadPtr(address);
                 }
-                catch (Exception)
+                catch
                 {
                 }
             }
@@ -74,7 +74,7 @@ namespace HackF5.UnitySpy.Util
                 return;
             }
 
-            if (ptr != Constants.NullPtr)
+            if (ptr != IntPtr.Zero)
             {
                 if (this.pointersShown.Contains(ptr))
                 {
@@ -86,7 +86,7 @@ namespace HackF5.UnitySpy.Util
                     {
                         strBuilder.AppendLine("Value as char *: " + this.process.ReadAsciiString(ptr));
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 
