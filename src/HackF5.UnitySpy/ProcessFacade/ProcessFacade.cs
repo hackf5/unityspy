@@ -308,8 +308,7 @@
 
                 case TypeCode.U:
                 case TypeCode.U4:
-                    return sizeof(uint);
-
+                    return 8;
                 case TypeCode.I8:
                     return sizeof(long);
 
