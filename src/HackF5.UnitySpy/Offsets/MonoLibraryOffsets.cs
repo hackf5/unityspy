@@ -333,7 +333,7 @@ namespace HackF5.UnitySpy.Offsets
                         }
 
                         Console.WriteLine(unsupportedMsg);
-                        Console.WriteLine($"Offsets of {bestCandidateUnityVersion.ToString()} selected instead.");
+                        Console.WriteLine($"Offsets of {bestCandidateUnityVersion} selected instead.");
 
                         return bestCandidate;
                     }

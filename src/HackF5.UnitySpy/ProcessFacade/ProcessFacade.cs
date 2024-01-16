@@ -192,7 +192,7 @@
         private object[] ReadManagedArray(TypeInfo type, List<TypeInfo> genericTypeArguments, IntPtr address)
         {
             var ptr = this.ReadPtr(address);
-            if (ptr == Constants.NullPtr)
+            if (ptr == IntPtr.Zero)
             {
                 return default;
             }
@@ -216,7 +216,7 @@
         private ManagedClassInstance ReadManagedClassInstance(TypeInfo type, List<TypeInfo> genericTypeArguments, IntPtr address)
         {
             var ptr = this.ReadPtr(address);
-            return ptr == Constants.NullPtr
+            return ptr == IntPtr.Zero
                 ? default
                 : new ManagedClassInstance(type.Image, genericTypeArguments, ptr);
         }
@@ -252,7 +252,7 @@
         private string ReadManagedString(IntPtr address)
         {
             var ptr = this.ReadPtr(address);
-            if (ptr == Constants.NullPtr)
+            if (ptr == IntPtr.Zero)
             {
                 return default;
             }

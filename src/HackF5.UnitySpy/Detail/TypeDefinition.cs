@@ -7,7 +7,6 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -58,9 +57,9 @@
             this.NamespaceName = this.ReadString(image.Process.MonoLibraryOffsets.TypeDefinitionNamespace);
             this.Size = this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionSize);
             var vtablePtr = this.ReadPtr(image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfo);
-            this.VTable = vtablePtr == Constants.NullPtr ? Constants.NullPtr : image.Process.ReadPtr(vtablePtr + image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVTables);
+            this.VTable = vtablePtr == IntPtr.Zero ? IntPtr.Zero : image.Process.ReadPtr(vtablePtr + image.Process.MonoLibraryOffsets.TypeDefinitionRuntimeInfoDomainVTables);
             this.TypeInfo = new TypeInfo(image, this.Address + image.Process.MonoLibraryOffsets.TypeDefinitionByValArg);
-            this.VTableSize = vtablePtr == Constants.NullPtr ? 0 : this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionVTableSize);
+            this.VTableSize = vtablePtr == IntPtr.Zero ? 0 : this.ReadInt32(image.Process.MonoLibraryOffsets.TypeDefinitionVTableSize);
             this.ClassKind = (MonoClassKind)(this.ReadByte(image.Process.MonoLibraryOffsets.TypeDefinitionClassKind) & 0x7);
 
             // Get the generic type arguments
@@ -68,7 +67,7 @@
             {
                 var monoGenericClassAddress = this.TypeInfo.Data;
                 var monoClassAddress = this.Process.ReadPtr(monoGenericClassAddress);
-                TypeDefinition monoClass = this.Image.GetTypeDefinition(monoClassAddress);
+                this.Image.GetTypeDefinition(monoClassAddress);
 
                 var monoGenericContainerPtr = monoClassAddress + this.Process.MonoLibraryOffsets.TypeDefinitionGenericContainer;
                 var monoGenericContainerAddress = this.Process.ReadPtr(monoGenericContainerPtr);
@@ -165,9 +164,7 @@
             }
             catch (Exception e)
             {
-                throw new Exception(
-                    $"Exception received when trying to get static value for field '{fieldName}' in class '{this.FullName}': ${e.Message}.",
-                    e);
+                throw new Exception($"Exception received when trying to get static value for field '{fieldName}' in class '{this.FullName}': ${e.Message}.", e);
             }
         }
 
@@ -190,7 +187,7 @@
         private IReadOnlyList<FieldDefinition> GetFields()
         {
             var firstField = this.ReadPtr(this.Image.Process.MonoLibraryOffsets.TypeDefinitionFields);
-            if (firstField == Constants.NullPtr)
+            if (firstField == IntPtr.Zero)
             {
                 return this.Parent?.Fields ?? new List<FieldDefinition>();
             }
@@ -205,7 +202,7 @@
                 for (var fieldIndex = 0; fieldIndex < this.fieldCount; fieldIndex++)
                 {
                     var field = firstField + (fieldIndex * this.Process.MonoLibraryOffsets.TypeDefinitionFieldSize);
-                    if (this.Process.ReadPtr(field) == Constants.NullPtr)
+                    if (this.Process.ReadPtr(field) == IntPtr.Zero)
                     {
                         break;
                     }
@@ -222,7 +219,6 @@
         private string GetFullName()
         {
             var builder = new StringBuilder();
-
             var hierarchy = this.NestedHierarchy().Reverse().ToArray();
             if (!string.IsNullOrWhiteSpace(this.NamespaceName))
             {

@@ -105,7 +105,7 @@
             //// pointer to array of structs of type _MonoAssembly
             var assemblyArrayAddress = process.ReadPtr(domain + process.MonoLibraryOffsets.ReferencedAssemblies);
             for (var assemblyAddress = assemblyArrayAddress;
-                assemblyAddress != Constants.NullPtr;
+                assemblyAddress != IntPtr.Zero;
                 assemblyAddress = process.ReadPtr(assemblyAddress + process.SizeOfPtr))
             {
                 var assembly = process.ReadPtr(assemblyAddress);
@@ -132,10 +132,9 @@
             var numberOfFunctions = moduleDump.ToInt32(exportDirectory + PEFormatOffsets.NumberOfFunctions);
             var functionAddressArrayIndex = moduleDump.ToInt32(exportDirectory + PEFormatOffsets.FunctionAddressArrayIndex);
             var functionNameArrayIndex = moduleDump.ToInt32(exportDirectory + PEFormatOffsets.FunctionNameArrayIndex);
-
-            var rootDomainFunctionAddress = Constants.NullPtr;
+            var rootDomainFunctionAddress = IntPtr.Zero;
             for (var functionIndex = 0;
-                functionIndex < (numberOfFunctions * PEFormatOffsets.FunctionEntrySize);
+                functionIndex < numberOfFunctions * PEFormatOffsets.FunctionEntrySize;
                 functionIndex += PEFormatOffsets.FunctionEntrySize)
             {
                 var functionNameIndex = moduleDump.ToInt32(functionNameArrayIndex + functionIndex);
@@ -149,7 +148,7 @@
                 }
             }
 
-            if (rootDomainFunctionAddress == Constants.NullPtr)
+            if (rootDomainFunctionAddress == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to find mono_get_root_domain function.");
             }
@@ -159,7 +158,7 @@
 
         private static IntPtr GetRootDomainFunctionAddressMachOFormat(ModuleInfo monoModuleInfo)
         {
-            var rootDomainFunctionAddress = Constants.NullPtr;
+            var rootDomainFunctionAddress = IntPtr.Zero;
 
             byte[] moduleFromPath = File.ReadAllBytes(monoModuleInfo.Path);
 
@@ -196,7 +195,7 @@
                 }
             }
 
-            if (rootDomainFunctionAddress == Constants.NullPtr)
+            if (rootDomainFunctionAddress == IntPtr.Zero)
             {
                 throw new InvalidOperationException("Failed to find mono_get_root_domain function.");
             }

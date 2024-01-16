@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using HackF5.UnitySpy.ProcessFacade;
-    using HackF5.UnitySpy.Util;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -68,7 +67,7 @@
 
         public TypeDefinition GetTypeDefinition(IntPtr address)
         {
-            if (address == Constants.NullPtr)
+            if (address == IntPtr.Zero)
             {
                 return default;
             }
@@ -81,7 +80,6 @@
         private ConcurrentDictionary<IntPtr, TypeDefinition> CreateTypeDefinitions()
         {
             var definitions = new ConcurrentDictionary<IntPtr, TypeDefinition>();
-
             int classCache = this.Process.MonoLibraryOffsets.ImageClassCache;
             var classCacheSize = this.ReadUInt32(classCache + this.Process.MonoLibraryOffsets.HashTableSize);
             var classCacheTableArray = this.ReadPtr(classCache + this.Process.MonoLibraryOffsets.HashTableTable);
@@ -91,7 +89,7 @@
                 tableItem += this.Process.SizeOfPtr)
             {
                 for (var definition = this.Process.ReadPtr(classCacheTableArray + tableItem);
-                    definition != Constants.NullPtr;
+                    definition != IntPtr.Zero;
                     definition = this.Process.ReadPtr(definition + this.Process.MonoLibraryOffsets.TypeDefinitionNextClassCache))
                 {
                     definitions.GetOrAdd(definition, new TypeDefinition(this, definition));
