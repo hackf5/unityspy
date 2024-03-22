@@ -1,4 +1,4 @@
-﻿// ReSharper disable IdentifierTypo
+// ReSharper disable IdentifierTypo
 namespace HackF5.UnitySpy.Offsets
 {
     using System;
@@ -83,6 +83,68 @@ namespace HackF5.UnitySpy.Offsets
             VTable = 0x28 + 0x18,
         };
 
+        public static readonly MonoLibraryOffsets Unity2021_3_14_x64_PE_Offsets = new MonoLibraryOffsets
+        {
+            UnityVersions = new List<UnityVersion>() { UnityVersion.Version2021_3_14 },
+            Is64Bits = true,
+            Format = BinaryFormat.PE,
+            MonoLibrary = "mono-2.0-bdwgc.dll",
+
+            // offset in _MonoAssembly to field 'image' (Type MonoImage*)
+            AssemblyImage = 0x10 + 0x50,
+
+            // field 'domain_assemblies' in _MonoDomain (domain-internals.h)
+            ReferencedAssemblies = 0xa0,
+
+            // field 'class_cache' in _MonoImage
+            ImageClassCache = 0x4d0,
+            HashTableSize = 0xc + 0xc,
+            HashTableTable = 0x14 + 0xc,
+
+            // size of every field in the field information | source _MonoClassField (class-internals.h)
+            TypeDefinitionFieldSize = 0x20,                         // 3 ptr + int + padding
+
+            // _MonoClass
+            // starting from size_inited, valuetype, enumtype
+            TypeDefinitionBitFields = 0x14 + 0xc,
+            // class_kind
+            TypeDefinitionClassKind = 0x1b,                   // alt: 0x1e + 0xc
+            // parent
+            TypeDefinitionParent = 0x30,
+            // nested_in
+            TypeDefinitionNestedIn = 0x38,
+            // name
+            TypeDefinitionName = 0x48,
+            // name_space
+            TypeDefinitionNamespace = 0x50,                      // 0x48 + 0x8
+            // vtable_size
+            TypeDefinitionVTableSize = 0x5C,                    // 0x50 + 0x8 + 0x4
+            // sizes
+            TypeDefinitionSize = 0x90,                                  // Static Fields / Array Element Count / Generic Param Types
+            // fields
+            TypeDefinitionFields = 0x98,                                // 0x98
+            // _byval_arg
+            TypeDefinitionByValArg = 0xB8,                       // 0x98 + 0x10 (2 ptr) + 0x10 (sizeof(MonoType))
+            // runtime_info
+            TypeDefinitionRuntimeInfo = 0x84 + 0x34 + 0x18,             // 0xD0
+
+            // MonoClassDef
+            //   field_count
+            TypeDefinitionFieldCount = 0xa4 + 0x34 + 0x18 + 0x10,       // 0xE0
+            //   next_class_cache
+            TypeDefinitionNextClassCache = 0xa8 + 0x34 + 0x18 + 0x10 + 0x4,    // 0xE4
+
+            TypeDefinitionMonoGenericClass = 0x94 + 0x34 + 0x18 + 0x10,
+            TypeDefinitionGenericContainer = 0x110,
+
+            TypeDefinitionRuntimeInfoDomainVTables = 0x2 + 0x6,  // 2 byte 'max_domain' + alignment to pointer size
+
+            // MonoVTable.vtable
+            // 5 ptr + 8 byte (max_interface_id -> gc_bits) + 8 bytes (4 + 4 padding) + 2 ptr
+            // 0x28 + 0x8 + 0x8 + 0x10
+            VTable = 0x48,
+        };
+
         public static readonly MonoLibraryOffsets Unity2019_4_2020_3_x64_MachO_Offsets = new MonoLibraryOffsets
         {
             UnityVersions = new List<UnityVersion> { UnityVersion.Version2019_4_5 },
@@ -125,6 +187,7 @@ namespace HackF5.UnitySpy.Offsets
             Unity2018_4_10_x86_PE_Offsets,
             Unity2019_4_2020_3_x64_PE_Offsets,
             Unity2019_4_2020_3_x64_MachO_Offsets,
+            Unity2021_3_14_x64_PE_Offsets,
         };
 
         public List<UnityVersion> UnityVersions { get; private set; }
