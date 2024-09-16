@@ -83,9 +83,9 @@ namespace HackF5.UnitySpy.Offsets
             VTable = 0x28 + 0x18,
         };
 
-        public static readonly MonoLibraryOffsets Unity2021_3_14_x64_PE_Offsets = new MonoLibraryOffsets
+        public static readonly MonoLibraryOffsets Unity2021_3_2022_3_x64_PE_Offsets = new MonoLibraryOffsets
         {
-            UnityVersions = new List<UnityVersion>() { UnityVersion.Version2021_3_14 },
+            UnityVersions = new List<UnityVersion>() { UnityVersion.Version2021_3_14, UnityVersion.Version2022_3_42 },
             Is64Bits = true,
             Format = BinaryFormat.PE,
             MonoLibrary = "mono-2.0-bdwgc.dll",
@@ -187,7 +187,7 @@ namespace HackF5.UnitySpy.Offsets
             Unity2018_4_10_x86_PE_Offsets,
             Unity2019_4_2020_3_x64_PE_Offsets,
             Unity2019_4_2020_3_x64_MachO_Offsets,
-            Unity2021_3_14_x64_PE_Offsets,
+            Unity2021_3_2022_3_x64_PE_Offsets,
         };
 
         public List<UnityVersion> UnityVersions { get; private set; }
