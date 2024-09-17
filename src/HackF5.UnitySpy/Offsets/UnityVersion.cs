@@ -9,6 +9,7 @@ namespace HackF5.UnitySpy.Offsets
         public static readonly UnityVersion Version2019_4_5 = new UnityVersion(2019, 4, 5);
         public static readonly UnityVersion Version2020_3_13 = new UnityVersion(2020, 3, 13);
         public static readonly UnityVersion Version2021_3_14 = new UnityVersion(2021, 3, 14);
+        public static readonly UnityVersion Version2022_3_42 = new UnityVersion(2022, 3, 42);
 
         public UnityVersion(int year, int versionWithinYear, int subversionWithinYear)
         {
