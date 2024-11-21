@@ -85,12 +85,12 @@ namespace HackF5.UnitySpy.Offsets
 
         public static readonly MonoLibraryOffsets Unity2021_3_2022_3_x64_PE_Offsets = new MonoLibraryOffsets
         {
-            UnityVersions = new List<UnityVersion>() { UnityVersion.Version2021_3_14, UnityVersion.Version2022_3_42 },
+            UnityVersions = new List<UnityVersion>() { UnityVersion.Version2021_3_14, UnityVersion.Version2022_3_40, UnityVersion.Version2022_3_42 },
             Is64Bits = true,
             Format = BinaryFormat.PE,
             MonoLibrary = "mono-2.0-bdwgc.dll",
 
-            // offset in _MonoAssembly to field 'image' (Type MonoImage*)
+            // offset in _MonoAssembly to field 'image' (Type MonoImage*), in metadata-internals.h
             AssemblyImage = 0x10 + 0x50,
 
             // field 'domain_assemblies' in _MonoDomain (domain-internals.h)
@@ -104,7 +104,7 @@ namespace HackF5.UnitySpy.Offsets
             // size of every field in the field information | source _MonoClassField (class-internals.h)
             TypeDefinitionFieldSize = 0x20,                         // 3 ptr + int + padding
 
-            // _MonoClass
+            // _MonoClass (class-private-definition.h)
             // starting from size_inited, valuetype, enumtype
             TypeDefinitionBitFields = 0x14 + 0xc,
             // class_kind

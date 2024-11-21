@@ -90,7 +90,7 @@
             this.Processes.IsNotifying = true;
             this.Processes.Refresh();
 
-            this.SelectedProcess = this.Processes.FirstOrDefault(p => p.Name == "Hearthstone");
+            this.SelectedProcess = this.Processes.FirstOrDefault(p => p.Name == "TheBazaar");
         }
     }
 }
