@@ -20,6 +20,10 @@
    <PlatformTarget>x64</PlatformTarget>
  </PropertyGroup>
 
+ <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+ </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Jetbrains.Annotations" Version="2019.1.1" />
     <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.3.2">
